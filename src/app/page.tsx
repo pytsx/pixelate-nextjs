@@ -1,20 +1,33 @@
-"use client"
-import Appbar from "@mui/material/Appbar";
-import Toolbar from "@mui/material/Toolbar";
-import Typography from "@mui/material/Typography";
+import React from "react";
+import { AppAppbar } from "./components/AppAppbar";
+import { Canvas } from "./components/Canvas";
 
-import { ModeSwitcher } from "@/components/modeSwitcher";
+import Container from "@mui/material/Container";
+import { ColorPicker } from "./components/ColorPicker";
+import Box from "@mui/material/Box";
+import Stack from "@mui/material/Stack";
 
 export default function Home() {
 
+
   return (
-    <Appbar>
-      <Toolbar sx={{ justifyContent: "space-between" }}>
-        <Typography variant="h1" sx={{ userSelect: "none", fontSize: "1.6rem" }}>
-          Logo
-        </Typography>
-        <ModeSwitcher />
-      </Toolbar>
-    </Appbar>
+    <React.Fragment>
+      <AppAppbar />
+
+      <Box sx={{ display: "flex" }}>
+
+        <ColorPicker />
+        <Box
+          sx={{
+            display: "flex",
+            width: "100%",
+            height: "100vh",
+            alignItems: "center",
+            justifyContent: "center"
+          }}>
+          <Canvas />
+        </Box>
+      </Box>
+    </React.Fragment>
   );
 }

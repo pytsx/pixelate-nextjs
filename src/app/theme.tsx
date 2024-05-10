@@ -3,6 +3,7 @@
 import type { } from '@mui/material/themeCssVarsAugmentation';
 
 import {
+  createTheme,
   type PaletteMode
 } from "@mui/material";
 
@@ -10,9 +11,13 @@ import {
   experimental_extendTheme as extendTheme
 } from "@mui/material/styles";
 
+const defaultTheme = createTheme()
+
+
 function getDesignTokens(mode: PaletteMode) {
   return {
     palette: {
+      ...defaultTheme.palette,
       mode,
       text: {
         primary: "#3d3d3d",
@@ -48,12 +53,13 @@ export default extendTheme({
   colorSchemes,
   ...rest,
   shape: {
-    borderRadius: 8
+    borderRadius: 2
   },
   components: {
     MuiAppBar: {
       defaultProps: {
         elevation: 0,
+        position: "absolute"
       },
       styleOverrides: {
         root: {
