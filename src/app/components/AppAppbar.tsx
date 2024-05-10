@@ -1,6 +1,6 @@
 "use client"
 
-import Appbar from "@mui/material/Appbar";
+import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { ModeSwitcher } from "./ModeSwitcher";
@@ -22,7 +22,7 @@ export function AppAppbar() {
   }
 
   return (
-    <Appbar>
+    <AppBar>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Typography
           style={{
@@ -36,6 +36,6 @@ export function AppAppbar() {
         />
         <ModeSwitcher />
       </Toolbar>
-    </Appbar>
+    </AppBar>
   )
 }
