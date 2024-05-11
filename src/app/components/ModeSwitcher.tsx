@@ -8,7 +8,7 @@ export const ModeSwitcher = () => {
   const [mounted, setMounted] = React.useState<boolean>(false)
   const { setMode, mode } = useColorScheme()
 
-  const toggleMode = () => setMode(mode == "dark" ? "light" : "dark")
+  const toggleMode = () => setMode(mode !== "dark" ? "dark" : "light")
 
   React.useEffect(() => setMounted(true), [])
 
