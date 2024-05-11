@@ -14,7 +14,9 @@ export const ModeSwitcher = () => {
 
   if (!mounted) {
     // for ssr
-    return null
+    return <IconButton>
+      ⬛
+    </IconButton>
   }
   return (
     <IconButton onClick={toggleMode} >

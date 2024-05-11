@@ -10,7 +10,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import theme from "./theme";
 import colorSchemeScript from "./getInitialColorScript";
-import { CanvasProvider } from "@/provider";
+import { EditorProvider } from "@/provider";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -36,11 +36,12 @@ export default function RootLayout({
           <CssVarsProvider
             theme={theme}
             defaultMode="system"
+            disableTransitionOnChange
           >
-            <CanvasProvider  >
               <CssBaseline />
+            <EditorProvider>
               {children}
-            </CanvasProvider>
+            </EditorProvider>
           </CssVarsProvider>
         </AppRouterCacheProvider>
       </body>

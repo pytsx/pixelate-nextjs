@@ -3,7 +3,7 @@ import { AppAppbar } from "./components/AppAppbar";
 import { Canvas } from "./components/Canvas";
 
 import Container from "@mui/material/Container";
-import { ColorPicker } from "./components/ColorPicker";
+import { EditorActions } from "./components/EditorActions";
 import Box from "@mui/material/Box";
 import Stack from "@mui/material/Stack";
 
@@ -16,7 +16,7 @@ export default function Home() {
 
       <Box sx={{ display: "flex" }}>
 
-        <ColorPicker />
+        <EditorActions />
         <Box
           sx={{
             display: "flex",

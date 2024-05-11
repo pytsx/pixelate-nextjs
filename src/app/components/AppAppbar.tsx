@@ -4,11 +4,11 @@ import AppBar from "@mui/material/AppBar";
 import Toolbar from "@mui/material/Toolbar";
 import Typography from "@mui/material/Typography";
 import { ModeSwitcher } from "./ModeSwitcher";
-import { useCanvas } from "@/provider";
+import { useEditor } from "@/provider";
 
 export function AppAppbar() {
 
-  const { state, dispatch } = useCanvas()
+  const { state, dispatch } = useEditor()
 
   function rename(e: React.FocusEvent<HTMLSpanElement, Element>) {
     const context = e.target.innerText

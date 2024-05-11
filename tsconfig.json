@@ -26,8 +26,8 @@
     "**/*.ts",
     "**/*.tsx",
     ".next/types/**/*.ts",
-    "src/provider/canvas.jsx",
-    "src/provider/canvasReducer.ts"
+    "src/provider/editor.jsx",
+    "src/provider/editorReducer.js"
   ],
   "exclude": ["node_modules"]
 }

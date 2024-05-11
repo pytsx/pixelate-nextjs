@@ -1,6 +1,6 @@
 "use client"
 
-import { useCanvas } from "@/provider"
+import { useEditor } from "@/provider"
 import { colorsMap } from "@/provider/colorsMap"
 import Box from "@mui/material/Box"
 import Stack from "@mui/material/Stack"
@@ -8,12 +8,13 @@ import Stack from "@mui/material/Stack"
 import { alpha, darken, styled } from "@mui/material/styles"
 import React from "react"
 
+
 const Cell = styled("div", {
   name: "Cell",
-  slot: "root"
+  slot: "root",
 })(({ theme }) => ({
-  width: "1.6rem",
-  height: "1.6rem",
+  width: "clamp(.8rem, 2vw, 2rem)",
+  height: "clamp(.8rem, 2vw, 2rem)",
   display: "inline-block",
   boxShadow: `inset 0px 0px 0px 1px ${alpha(theme.palette.grey[400], .1)}`,
   ...theme.applyStyles("dark", {
@@ -23,7 +24,7 @@ const Cell = styled("div", {
 }))
 
 export function Canvas() {
-  const { state, dispatch } = useCanvas()
+  const { state, dispatch } = useEditor()
   const [enableFill, setEnableFill] = React.useState<boolean>(false)
 
   function fillCell(x: number, y: number, forced: boolean = false) {
@@ -37,6 +38,7 @@ export function Canvas() {
       }
     })
   }
+
 
   React.useEffect(() => {
     const enable = () => setEnableFill(true)
@@ -57,7 +59,9 @@ export function Canvas() {
       border: "1px solid",
       borderColor: theme.palette.grey[700],
       borderRadius: theme.shape.borderRadius,
-      overflow: "clip"
+      overflow: "clip",
+      margin: 1,
+      cursor: "crosshair"
     })}
     >
       <Stack direction={"row"} >
@@ -69,8 +73,8 @@ export function Canvas() {
                   <Cell
                     draggable={false}
                     key={`cell-${cell}-${index}`}
-                    onMouseOver={() => fillCell(index, rIndex)}
-                    onClick={() => fillCell(index, rIndex, true)}
+                    onMouseOver={() => cell !== state.selectedColor && fillCell(index, rIndex)}
+                    onMouseDown={() => cell !== state.selectedColor && fillCell(index, rIndex, true)}
                     sx={(theme) => ({
                       backgroundColor: colorsMap[cell] === null
                         ? "transparent"

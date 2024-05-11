@@ -1,30 +1,16 @@
 "use client"
 
 import * as React from "react"
-import { canvasReducer } from "./canvasReducer"
+import { editorReducer, getInitialState } from "./editorReducer"
 
 const Context = React.createContext({})
 
-let matrix = []
-matrix.length = 32
 
-const rows = []
-rows.length = 32
-rows.fill(-1)
 
-matrix.fill(rows)
-
-const initialState = {
-  name: "teste",
-  matrix,
-  selectedColor: 0
-}
-
-export function CanvasProvider(props) {
+export function EditorProvider(props) {
   const { children } = props
-
-  const [state, dispatch] = React.useReducer(canvasReducer, initialState)
-
+  const initialState = getInitialState(30, 25)
+  const [state, dispatch] = React.useReducer(editorReducer, initialState)
 
   return (
     <Context.Provider value={{
@@ -37,7 +23,7 @@ export function CanvasProvider(props) {
 }
 
 
-export function useCanvas() {
+export function useEditor() {
   const context = React.useContext(Context)
 
   if (!context) {
