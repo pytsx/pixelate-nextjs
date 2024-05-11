@@ -5,7 +5,6 @@ import React from "react"
 import AppBar from "@mui/material/AppBar"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Container from "@mui/material/Container"
 import InputBase from "@mui/material/InputBase"
 import Stack from "@mui/material/Stack"
 import Toolbar from "@mui/material/Toolbar"
@@ -15,6 +14,8 @@ import { styled, getContrastRatio, alpha, darken, lighten } from "@mui/material/
 
 import { Palette, Trash } from "lucide-react"
 import { useEditableCanvas } from "../../hooks"
+import { Title } from "./Title"
+import { ModeSwitcher } from "./ModeSwitcher"
 
 const CanvasRoot = styled("canvas", {
   name: "canvas",
@@ -47,97 +48,134 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
 
   const iconTextColor = React.useCallback(() => getContrastRatio(color, "#000") > 4 ? darken(color, .6) : lighten(color, .6), [color])
   const iconStyle = {
-    width: "1.2rem",
-    height: "1.2rem"
+    width: "1rem",
+    height: "1rem",
+
   }
 
   return <React.Fragment>
-    <AppBar position="relative"
-      sx={(theme) => ({
-        width: { xs: "100%", md: "fit-content" },
-        height: { xs: "fit-content", md: "100%", },
-        paddingTop: { xs: "", md: "3.6rem", },
-      })}
-
+    <AppBar
+      sx={{
+        height: "fit-content",
+        backgroundColor: "transparent !important",
+        zIndex: 1,
+      }}
     >
-      <Container sx={{ padding: { xs: "", md: "0 .25rem !important" } }}>
-        <Toolbar sx={{ padding: 0, display: "flex", flexDirection: "column" }}>
-          <Button
-            size="large"
-            onClick={reset}
-            color="error"
-            variant="outlined"
-            disableElevation
-            sx={{
-              borderRadius: 0,
-              marginBottom: ".5rem"
-            }}
-          >
-            <Trash style={iconStyle} />
-          </Button>
+      <Toolbar
+        sx={(theme) => ({
+          display: "flex",
+          alignItems: "center",
+          gap: 1,
+          padding: ".25rem .25rem",
+          height: "3.2rem",
+          backgroundColor: "background.paper",
+          justifyContent: "space-between",
+          border: "1px solid",
+          borderColor: theme.palette.grey[300],
+          ...theme.applyStyles("dark", {
+            borderColor: theme.palette.grey[900],
+          })
 
-          <Button
-            size="large"
-            disableFocusRipple
-            disableTouchRipple
-            sx={{
-              position: "relative",
-              overflow: "clip",
-              borderRadius: 0,
-              backgroundColor: color,
-              "&:hover": {
-                backgroundColor: alpha(color, .6),
-              }
-            }}>
-            <InputBase
-              onChange={(e) => {
-                setColor(e.target.value)
-              }}
-              type="color"
-              sx={{
-                cursor: "pointer",
-                position: "absolute",
-                width: "100%",
-                opacity: 0,
-                zIndex: 100,
-                "& .MuiInputBase-input": {
-                  backgroundColor: "red",
-                  aspectRatio: "1/1",
-                  minHeight: "3.5rem",
-                  cursor: "cell"
-                }
-              }}
-            />
-            <Palette style={{ ...iconStyle, color: iconTextColor() }} />
-          </Button>
+        })}>
 
-          <Stack sx={{ pt: 1, }} gap={.5}>
-            {
-              Object.keys(palette).map((c, index) => (
-                <Button
-                  key={`color-${index}=${c}`}
-                  onClick={() => setColor(c)}
-                  variant="contained"
-                  sx={{
-                    backgroundColor: c,
-                    borderRadius: ".25rem",
-                    border: "2px solid",
-                    borderColor: darken(c, .3),
-                    ":hover": {
-                      backgroundColor: alpha(c, .6),
-                    }
-                  }}
-                  disableElevation
-                >
-                </Button>
-              ))
-            }
-          </Stack>
-        </Toolbar>
-      </Container>
+        <div style={{ width: "3.2rem" }} />
+
+        <Title />
+        <ModeSwitcher />
+
+      </Toolbar>
     </AppBar>
 
-    <Box sx={{ width: "100%", height: "100%", display: "flex", padding: 1 }}>
+    <Box sx={{
+      width: "100%",
+      height: "100%",
+      display: "flex",
+      paddingTop: "calc(3.2rem - 1px)"
+    }}>
+      <Toolbar sx={{
+        display: "flex",
+        width: "3.2rem",
+        flexDirection: "column",
+        gap: .5,
+        backgroundColor: "background.paper",
+        padding: ".32rem",
+        zIndex: 10,
+      }}>
+
+        <Button
+          disableFocusRipple
+          disableTouchRipple
+          disableElevation
+          variant="contained"
+          sx={{
+            position: "relative",
+            overflow: "clip",
+            backgroundColor: color,
+            "&:hover": {
+              backgroundColor: alpha(color, .6),
+            }
+          }}>
+          <InputBase
+            onChange={(e) => {
+              setColor(e.target.value)
+            }}
+            type="color"
+            sx={{
+              cursor: "pointer",
+              position: "absolute",
+              width: "100%",
+              opacity: 0,
+              zIndex: 100,
+              "& .MuiInputBase-input": {
+                backgroundColor: "red",
+                minHeight: "3.5rem",
+                cursor: "cell"
+              }
+            }}
+          />
+          <Palette style={{ ...iconStyle, color: iconTextColor() }} />
+        </Button>
+
+
+        <Stack
+          gap={.25}
+          direction={"column"}
+          alignItems={"center"}
+          width={"100%"}
+          height={"100%"}
+        >
+          {
+            Object.keys(palette).map((c, index) => (
+              <Button
+                variant="contained"
+                key={`color-${index}=${c}`}
+                onClick={() => setColor(c)}
+                sx={{
+                  backgroundColor: c,
+                  border: "2px solid",
+                  borderColor: darken(c, .3),
+                  ":hover": {
+                    backgroundColor: alpha(c, .6),
+                  }
+                }}
+                disableElevation
+              >
+              </Button>
+            ))
+          }
+        </Stack>
+
+        <Button
+          onClick={reset}
+          color="error"
+          variant="contained"
+          disableElevation
+        >
+          <Trash style={iconStyle} />
+        </Button>
+
+      </Toolbar>
+
       <CanvasRoot
         ref={canvasRef}
         onMouseDown={mouseDown}

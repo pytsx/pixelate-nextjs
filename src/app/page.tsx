@@ -8,19 +8,14 @@ export default function Home() {
 
 
   return (
-    <React.Fragment>
-      <AppAppbar />
         <Box
           sx={{
           display: "flex",
-          flexDirection: { xs: "column-reverse", md: "row" },
+        flexDirection: "column",
           width: "100%",
-          height: "100vh",
-          alignItems: "center",
-          justifyContent: "space-between",
+        height: "100vh",
           }}>
         <Canvas />
-      </Box>
-    </React.Fragment>
+    </Box>
   );
 }

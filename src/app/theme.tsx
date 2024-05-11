@@ -63,23 +63,17 @@ export default extendTheme({
       },
       styleOverrides: {
         root: (({ theme }) => ({
-          backgroundColor: theme.palette.grey[200],
-          color: theme.palette.text.primary,
-          ...theme.applyStyles("dark", {
-            backgroundColor: theme.palette.grey[900]
-
-          })
+          backgroundColor: "background.paper",
         }))
       }
     },
     MuiToolbar: {
       defaultProps: {
         variant: "dense",
-        disableGutters: true
+        disableGutters: true,
       },
       styleOverrides: {
         root: ({ theme }) => ({
-          borderRadius: theme.shape.borderRadius,
           padding: ".125rem .75rem",
         })
       }
@@ -88,18 +82,11 @@ export default extendTheme({
     MuiButton: {
       styleOverrides: {
         root: () => ({
-          minHeight: "2rem"
+          width: "fit-content",
+          minWidth: "2.4rem",
+          padding: ".8rem",
         })
       },
-      variants: [
-
-        {
-          props: { size: "large" },
-          style: () => ({
-            aspectRatio: "1/.8"
-          })
-        }
-      ]
     }
   }
 })
