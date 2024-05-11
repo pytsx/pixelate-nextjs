@@ -11,19 +11,7 @@ export type EditorReducerActions =
     payload: {
       value: string
     }
-  } | {
-    type: "SELECT_COLOR",
-    payload: {
-      value: number
-    }
-  } | {
-    type: "FILL_CELL",
-    payload: {
-      x: number
-      y: number
-      value: number
-    }
-  } | { type: "RESET_MATRIX" }
+  } 
 
 /**
  * @param {number} rowSize the matrix row size

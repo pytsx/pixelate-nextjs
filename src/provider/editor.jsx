@@ -5,11 +5,9 @@ import { editorReducer, getInitialState } from "./editorReducer"
 
 const Context = React.createContext({})
 
-
-
 export function EditorProvider(props) {
   const { children } = props
-  const initialState = getInitialState(30, 25)
+  const initialState = getInitialState()
   const [state, dispatch] = React.useReducer(editorReducer, initialState)
 
   return (

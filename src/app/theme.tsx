@@ -62,8 +62,14 @@ export default extendTheme({
         position: "absolute"
       },
       styleOverrides: {
-        root: {
-        }
+        root: (({ theme }) => ({
+          backgroundColor: theme.palette.grey[200],
+          color: theme.palette.text.primary,
+          ...theme.applyStyles("dark", {
+            backgroundColor: theme.palette.grey[900]
+
+          })
+        }))
       }
     },
     MuiToolbar: {
@@ -77,6 +83,23 @@ export default extendTheme({
           padding: ".125rem .75rem",
         })
       }
+    },
+
+    MuiButton: {
+      styleOverrides: {
+        root: () => ({
+          minHeight: "2rem"
+        })
+      },
+      variants: [
+
+        {
+          props: { size: "large" },
+          style: () => ({
+            aspectRatio: "1/.8"
+          })
+        }
+      ]
     }
   }
 })

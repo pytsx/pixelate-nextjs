@@ -22,7 +22,7 @@ export function AppAppbar() {
   }
 
   return (
-    <AppBar>
+    <AppBar position="absolute" sx={{ height: "3.2rem" }}>
       <Toolbar sx={{ justifyContent: "space-between" }}>
         <Typography
           style={{
