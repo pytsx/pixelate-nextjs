@@ -28,7 +28,9 @@
     "**/*.tsx",
     ".next/types/**/*.ts",
     "src/provider/editor.jsx",
-    "src/provider/editorReducer.js"
+    "src/provider/editorReducer.js",
+    "src/lib/state/index.js",
+    "src/lib/utils/types.js"
   ],
   "exclude": ["node_modules"]
 }

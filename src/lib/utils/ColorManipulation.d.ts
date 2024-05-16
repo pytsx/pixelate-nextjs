@@ -21,23 +21,9 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
-
-import Box from "@mui/material/Box";
-
-export default function Home() {
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
-}
+export function toHex(a: number): string
+export function rgbToHex(r: number, g: number, b: number): HexColor
+export function hexToRgb(hex: HexColor): [number, number, number]
+export function isLightColor(rgb: [number, number, number]): Boolean
+export function isHexColor(hex: HexColor | string): hex is `#${string}`
+export type HexColor = `#${string}`

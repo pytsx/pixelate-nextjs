@@ -21,23 +21,11 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
+export function showFileDialog(callback: (file: File) => void): void
+export function downloadFile(file: File): void
 
-import Box from "@mui/material/Box";
+export async function decodeBase64(base64Data: string): Promise<File>
+export async function loadImageFile(imageFile: File): Promise<HTMLImageElement>
+export async function waitForImage(img: HTMLImageElement): Promise<HTMLImageElement>
 
-export default function Home() {
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
-}
+declare const STORAGE_KEY: string

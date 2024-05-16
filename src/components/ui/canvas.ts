@@ -21,23 +21,32 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
+"use client"
 
 import Box from "@mui/material/Box";
+import { styled } from "@mui/material/styles";
 
-export default function Home() {
+export const CanvasRoot = styled("canvas", {
+  name: "canvas",
+  slot: "root",
+})(({ theme }) => ({
+  overflow: "hidden",
+  // cursor: "crosshair",
+  imageRendering: "pixelated",
+  boxShadow: "0px 4px 6px 1px #2d2d2d24",
+  borderRadius: "4px"
+}))
 
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
-}
+export const CanvasBox = styled(Box)(() => ({
+  maxHeight: "calc(100vh - 3.2rem)",
+  maxWidth: "100vw",
+  height: "100%",
+  width: "100%",
+  overflow: "auto",
+  display: "flex",
+  alignItems: "start",
+  justifyContent: "center",
+  scrollbarGutter: "stable",
+  scrollbarWidth: "thin",
+  padding: "2rem 0 ",
+}))

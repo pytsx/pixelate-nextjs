@@ -1,6 +1,6 @@
 {
   "name": "pixelate",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -13,6 +13,7 @@
     "@emotion/react": "^11.11.4",
     "@emotion/server": "^11.11.0",
     "@emotion/styled": "^11.11.5",
+    "@mui/lab": "5.0.0-alpha.170",
     "@mui/material": "^5.15.17",
     "@mui/material-nextjs": "^5.15.11",
     "@mui/utils": "^5.15.14",

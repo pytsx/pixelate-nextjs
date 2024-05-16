@@ -21,23 +21,27 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
+import { EditableImageData } from "../image"
 
-import Box from "@mui/material/Box";
+interface ProcessProps {
+  canvasRef: React.RefObject<HTMLCanvasElement>
 
-export default function Home() {
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
 }
+
+interface IPreprocess {
+  minTargetWidth: number
+  targetColors: number
+  targetWidth: number
+  targetHeight: () => number
+  maxTargetColors: () => number
+  maxTargetWidth: () => number
+  realWidth: () => number
+  realHeight: () => number
+  ngOnInit: () => void
+  setTargetWidth(value: number): void
+  ngOnChanges: () => void
+  setTargetColor: (value: number) => void
+}
+
+
+export function usePreprocess(): IPreprocess 

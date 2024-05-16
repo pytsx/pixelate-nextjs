@@ -21,23 +21,25 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
+import { EditorState } from "../editor"
+import { HexColor } from "../utils"
 
-import Box from "@mui/material/Box";
-
-export default function Home() {
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
+export interface IInstructions {
+  totalWidth(): number
+  totalHeight(): number
+  totalCount(): number
+  lowerTime(): number
+  upperTime(): number
+  getIndex(color: HexColor): string
+  width(): number
+  height(): number
+  isHalf(index: number, total: number): boolean
+  toggleCrossedColor(color: HexColor): void
+  toggleCrossedRow(row: number): void
+  toggleCrossedColumn(column: number): void
 }
+
+
+export function useInstructions(): IInstructions
+
+function toggle<T>(value: T, set: Set<T>): void

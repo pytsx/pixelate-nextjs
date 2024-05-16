@@ -21,23 +21,11 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
+import { EditableImageData, HexColor } from "../image"
+import { DeepPartial } from "../utils"
 
-import Box from "@mui/material/Box";
+export function getDefaultDrawState(): Omit<EditState, 'imageData'>
+export function deserializeState(str: string): Promise<DeepPartial<EditState>>
+export function serializeState(state: EditState): string
 
-export default function Home() {
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
-}
+function parseNumberArray(str: string): number[]

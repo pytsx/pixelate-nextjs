@@ -21,23 +21,18 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
+export function requireNonNull<T>(value: T | null | undefined, msg?: string): NonNullable<typeof value>
+export function requireTruthy<T>(value: T | null | undefined, msg?: string): TruthyTypesOf<T | null | undefined>
+export function assert<T>(value: T | null | undefined, msg?: string): asserts value is TruthyTypesOf<T>
+export function assertTrue(value: boolean | null | undefined, msg?: string): asserts value is true
 
-import Box from "@mui/material/Box";
+export function isEnum<T extends string>(value: string | null | undefined, enumType: StringEnum<T>): value is T
 
-export default function Home() {
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
+export interface StringEnum<T> {
+  [id: string]: T | string
 }
+
+export type DeepPartial<T> = T extends Object ? {
+  [P in keyof T]?: DeepPartial<T[P]>
+} : T
+

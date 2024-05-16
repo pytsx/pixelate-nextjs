@@ -21,23 +21,14 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
-
-import Box from "@mui/material/Box";
-
-export default function Home() {
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
+export function requireNonNull(value) {
+  if (value === null) {
+    throw new Error("Value is null")
+  }
+  return value
 }
+
+export function requireTruthy(value, msg) { }
+export function assert(value, msg) { }
+export function assertTrue(value, msg) { }
+export function isEnum(value, enumType) { }

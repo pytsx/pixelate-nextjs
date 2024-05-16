@@ -21,23 +21,27 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
+"use client"
 
-import Box from "@mui/material/Box";
+import IconButton from "@mui/material/IconButton"
+import { useColorScheme } from "@mui/material/styles"
+import React from "react"
 
-export default function Home() {
+export const ModeSwitcher = () => {
+  const [mounted, setMounted] = React.useState<boolean>(false)
+  const { setMode, mode } = useColorScheme()
 
+  const toggleMode = () => setMode(mode !== "dark" ? "dark" : "light")
+
+  React.useEffect(() => setMounted(true), [])
+
+  if (!mounted) {
+    // for ssr
+    return <div style={{ height: "3rem", width: "3rem" }} />
+  }
   return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
+    <IconButton onClick={toggleMode} >
+      {mode == "dark" ? "🌞" : "🌜"}
+    </IconButton>
+  )
 }

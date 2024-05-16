@@ -21,23 +21,9 @@
  * Copyright 2022 Google LLC
  */
 
-import React from "react";
-import { Canvas } from "../components/Canvas";
+export function getDefaultDrawState() { }
 
-import Box from "@mui/material/Box";
+export function deserializeState(str) { }
+export function serializeState(state) { }
 
-export default function Home() {
-
-  return (
-    <Box
-      sx={{
-        display: "flex",
-        flexDirection: "column",
-        width: "100%",
-        height: "100vh",
-      }}
-    >
-      <Canvas />
-    </Box>
-  );
-}
+function parseNumberArray(str) { }
