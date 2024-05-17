@@ -29,7 +29,13 @@ import { HexColor } from "./ColorManipulation"
 import { requireNonNull } from "./types"
 
 
-
+/**
+ * 
+ * DirtyArea é um objeto que representa uma área do canvas que 
+ * precisa ser redesenhada. Isso é útil para otimizar a 
+ * renderização, pois permite que você redesenhe apenas a parte do 
+ * canvas que foi alterada, em vez de todo o canvas.
+ */
 export interface DirtyArea {
   left: number
   top: number

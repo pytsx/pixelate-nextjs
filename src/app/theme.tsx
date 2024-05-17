@@ -113,6 +113,7 @@ export default extendTheme({
       },
       styleOverrides: {
         paper: ({ theme }) => ({
+          width: "fit-content",
           paddingTop: "3.2rem",
           border: "none",
           backgroundColor: alpha("#ffffff", .5),
@@ -124,11 +125,29 @@ export default extendTheme({
       },
     },
     MuiButton: {
+      defaultProps: {
+        disableElevation: true,
+        disableFocusRipple: true,
+        disableTouchRipple: true,
+      },
       styleOverrides: {
         root: () => ({
           width: "fit-content",
           minWidth: "2.4rem",
           padding: ".8rem",
+        }),
+        contained: ({ theme }) => ({
+          backgroundColor: "red"
+        })
+      }
+    },
+    MuiToggleButton: {
+      styleOverrides: {
+        root: ({ theme }) => ({
+          color: theme.palette.grey[800],
+          ...theme.applyStyles("dark", {
+            color: theme.palette.grey[400],
+          })
         })
       }
     },

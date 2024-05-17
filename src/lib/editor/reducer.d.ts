@@ -21,9 +21,18 @@
  * Copyright 2022 Google LLC
  */
 
-import { CanvasEditorState } from "."
 import { EditableCanvas, EditableImageData } from "../image"
 
+
+export interface CanvasEditorState {
+  activeColor: HexColor
+  activeTool: Tool
+  size: number
+  maxScale: number
+  enableFill: boolean
+  palette: HexColor[]
+  zoom: number
+}
 export interface EditorState {
   mode: Mode.PREPROCESS | Mode.DRAW | Mode.ASSEMBLE
   canvasEditorState: CanvasEditorState

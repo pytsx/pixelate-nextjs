@@ -28,7 +28,7 @@ export class EditableCanvas {
     canvas,
     imageData
   ) {
-    this._imageData = imageData;
+    this._imageData = imageData
     this._canvas = canvas;
     this._canvas.width = this._imageData.width;
     this._canvas.height = this._imageData.height;
@@ -38,19 +38,12 @@ export class EditableCanvas {
     this.redraw();
   }
 
-  get width() {
-    return this._imageData.width;
-  }
+  get width() { return this._imageData.width }
+  get height() { return this._imageData.height }
+  get counter() { return this._imageData.counter }
+  get imageData() { return this._imageData }
 
-  get height() {
-    return this._imageData.height;
-  }
-  get counter() {
-    return this._imageData.counter;
-  }
-  get imageData() {
-    return this._imageData;
-  }
+  pick(x, y) { return this._imageData.pick(x, y) }
 
   setImageData(img) {
     this._imageData = img;
@@ -60,47 +53,23 @@ export class EditableCanvas {
   }
 
   redraw(dirtyArea) {
-    let temp = dirtyArea || {
+    dirtyArea ??= {
       left: 0,
       top: 0,
       right: this.width - 1,
       bottom: this.height - 1,
-    };
+    }
+
     this._ctx.putImageData(
       this._imageData.imageData,
       0,
       0,
-      temp.left,
-      temp.top,
-      temp.right - temp.left + 1,
-      temp.bottom - temp.top + 1
-    );
+      dirtyArea.left,
+      dirtyArea.top,
+      dirtyArea.right - dirtyArea.left + 1,
+      dirtyArea.bottom - dirtyArea.top + 1
+    )
   }
 
-  pick(x, y) {
-    return this._imageData.pick(x, y);
-  }
 
-  // applyMany(operations) {
-  //   const dirty = operations.reduce(
-  //     (dirtyArea, operation) =>
-  //       mergeDirtyAreas(dirtyArea, this.apply(this._imageData, operation)), null
-  //   );
-  //   if (dirty) {
-  //     this.redraw(dirty);
-  //   }
-  // }
-
-  // apply(imageData, operation) {
-  //   const { tool, color, x, y } = operation
-  //   if (tool === Tool.DRAW) {
-  //     return imageData.draw(x, y, color);
-  //   } else if (tool === Tool.FILL) {
-  //     return imageData.fill(x, y, color);
-  //   } else if (tool === Tool.MAGIC_WAND) {
-  //     return imageData.fillAll(x, y, color);
-  //   } else {
-  //     throw new Error(`Unknown tool ${tool}`);
-  //   }
-  // }
 }

@@ -30,23 +30,24 @@ export const CanvasRoot = styled("canvas", {
   name: "canvas",
   slot: "root",
 })(({ theme }) => ({
-  overflow: "hidden",
-  // cursor: "crosshair",
   imageRendering: "pixelated",
   boxShadow: "0px 4px 6px 1px #2d2d2d24",
-  borderRadius: "4px"
+  borderRadius: "4px",
 }))
 
-export const CanvasBox = styled(Box)(() => ({
+export const CanvasBox = styled(Box)(({ theme }) => ({
   maxHeight: "calc(100vh - 3.2rem)",
-  maxWidth: "100vw",
   height: "100%",
-  width: "100%",
+  maxWidth: "100vw",
   overflow: "auto",
   display: "flex",
   alignItems: "start",
   justifyContent: "center",
   scrollbarGutter: "stable",
   scrollbarWidth: "thin",
-  padding: "2rem 0 ",
+  padding: "2rem",
+  marginLeft: "4rem",
+  [theme.breakpoints.down("lg")]: {
+    justifyContent: "flex-start",
+  }
 }))

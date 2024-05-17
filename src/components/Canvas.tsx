@@ -35,14 +35,15 @@ import TabContext from "@mui/lab/TabContext"
 import Typography from "@mui/material/Typography"
 
 import { getContrastRatio, alpha, darken, lighten } from "@mui/material/styles"
-import { EditableCanvas, Mode, useEditor, useCanvas, usePreprocess } from "@/lib"
+import { EditableCanvas, Mode, useEditor, useCanvas, usePreprocess, Tool, waitForImage } from "@/lib"
 
-import { Fullscreen, Palette, StopCircle, ZoomIn, ZoomOut } from "lucide-react"
+import { Fullscreen, PaintBucket, Paintbrush, Palette, Pencil, StopCircle, ZoomIn, ZoomOut } from "lucide-react"
 
 import { Slider, CanvasBox, CanvasRoot } from "./ui"
 import { AppAppBar } from "./AppAppbar"
 import Image from "next/image"
 import Logo from "../../public/logo.png"
+import { ToggleButton, ToggleButtonGroup } from "@mui/material"
 
 const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
   const {
@@ -59,11 +60,11 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
     mouseMove,
     ref,
     setColor,
-    palette,
     zoomIn,
     zoomOut,
     zoomToFit,
-    mouseUp
+    mouseUp,
+    setTool
   } = useCanvas()
 
   const {
@@ -77,6 +78,8 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
     realHeight,
     realWidth
   } = usePreprocess()
+
+  const imgRef = React.useRef<HTMLImageElement>(null)
 
   function handleTargetWidthChange(e: any, newValue: number | number[]) {
     if (state.imageData && ref.current) {
@@ -121,14 +124,12 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
     height: "1rem",
   }
 
-  const imgRef = React.useRef<HTMLImageElement>(null)
-
+  function getMainImage() {
+    return imgRef.current
+  }
 
   return <TabContext value={state.mode || Mode.PREPROCESS}>
-
     <AppAppBar />
-
-
     <Drawer
       open={state.mode === Mode.PREPROCESS}
       onClose={() => setMode(Mode.DRAW)}
@@ -178,8 +179,6 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
               {realWidth()}cm x {realHeight()}cm
             </Typography>
           </Stack>
-
-
         </Box >
       }
     </Drawer>
@@ -198,6 +197,28 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
         padding: ".5rem 0",
         width: "5rem"
       }}>
+        <ToggleButtonGroup
+          orientation="vertical"
+          value={state.canvasEditorState.activeTool}
+          exclusive
+          onChange={(e, value) => setTool(value)}
+        >
+          <ToggleButton
+            value={Tool.DRAW}
+          >
+            <Pencil />
+          </ToggleButton >
+          <ToggleButton
+            value={Tool.FILL}
+          >
+            <Paintbrush />
+          </ToggleButton >
+          <ToggleButton
+            value={Tool.FILL_ALL}
+          >
+            <PaintBucket />
+          </ToggleButton >
+        </ToggleButtonGroup>
         <Button
           disableFocusRipple
           disableTouchRipple
@@ -215,7 +236,7 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
             onChange={(e) => {
               setColor(e.target.value)
             }}
-
+            value={state.canvasEditorState?.activeColor || "#fff"}
             type="color"
             sx={{
               cursor: "pointer",
@@ -246,8 +267,8 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
             padding: ".5rem 0",
           }}
         >
-          {
-            palette.slice(0, 100).map((c, index) => (
+          {state.canvas &&
+            [...state.canvas.counter.keys()].slice(0, 100).map((c, index) => (
               <Button
                 variant="contained"
                 key={`color-${index}=${c}`}
@@ -292,25 +313,25 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
       </Box>
     </Drawer>
 
-    <CanvasBox>
+    <CanvasBox sx={{ marginLeft: "4.4rem" }}>
       {
         state.mode === Mode.NEW
-        &&
-        <Button onClick={uploadFile} sx={{ margin: "auto" }}>
+        && <Button onClick={openDrawMode} sx={{ margin: "auto" }}>
           <Box
             sx={{
               margin: "auto",
               display: "flex",
               flexDirection: "column"
             }}
-          >
+            >
 
             <Image
+                ref={imgRef}
               src={Logo}
               height={80}
               width={80}
               alt="logo"
-            />
+              />
             start
           </Box>
         </Button>
@@ -332,7 +353,8 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
             cursor:
               state.mode == Mode.DRAW
                 ? "crosshair"
-                : "default"
+                : "default",
+            width: state.canvas?.width
           }}
         />
       }

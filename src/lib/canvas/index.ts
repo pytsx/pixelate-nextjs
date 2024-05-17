@@ -26,36 +26,32 @@
 import React from "react"
 
 import { Mode, Tool, useEditor } from ".."
-import { HexColor, getContext2D } from "@/lib/utils"
-
+import { DirtyArea, HexColor, Operation, getContext2D } from "@/lib/utils"
 
 export function useCanvas() {
-  const size = 1
-  const MAX_SCALE = 23
   const { setCanvasState, state, setImageData } = useEditor()
-  const [enableFill, _setEnableFill] = React.useState<boolean>(false)
-  const [palette, setPalette] = React.useState<HexColor[]>([])
-  const [_zoom, _setZoom] = React.useState<number>(1)
+  const [operations, setOperations] = React.useState<Operation[]>([])
+  const [currentOperation, setCurrentOperation] = React.useState<number>(0)
 
   const ref = React.useRef<HTMLCanvasElement>(null)
 
-  const setEnableFill = (value: boolean) => _setEnableFill(value)
+  const setEnableFill = (value: boolean) => {
+    setCanvasState({
+      ...state.canvasEditorState,
+      enableFill: value
+    })
+  }
+
   const setColor = (value: string) => {
     setCanvasState({
-      activeTool: state.canvasEditorState?.activeTool || Tool.DRAW,
+      ...state.canvasEditorState,
       activeColor: value
     })
   }
 
-  React.useEffect(() => {
-    if (state.canvas) {
-      setPalette([...state.canvas.counter.keys()])
-    }
-  }, [state.canvas?.counter, state.canvas])
-
   function mouseMove(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault()
-    if (!enableFill) return
+    if (!state.canvasEditorState.enableFill) return
     mouseHandler(e)
   }
 
@@ -64,7 +60,10 @@ export function useCanvas() {
     if (!ref.current || !state.canvas) return
     ref.current.style.width = `${state.canvas.width * value}px`
     ref.current.style.height = `${state.canvas.height * value}px`
-    _setZoom(value)
+    setCanvasState({
+      ...state.canvasEditorState,
+      zoom: value
+    })
   }
 
   function zoom(): number {
@@ -73,10 +72,11 @@ export function useCanvas() {
   }
 
   function zoomIn() {
-    setZoom(Math.min(MAX_SCALE, _zoom + 1))
+    setZoom(Math.min(state.canvasEditorState.maxScale, state.canvasEditorState.zoom + 1))
+
   }
   function zoomOut() {
-    setZoom(Math.max(1, _zoom - 1))
+    setZoom(Math.max(1, state.canvasEditorState.zoom - 1))
   }
 
   function zoomToFit() {
@@ -86,11 +86,13 @@ export function useCanvas() {
         Math.min(
           (window.innerWidth / state.canvas.width) * 0.9,
           (window.innerHeight / state.canvas.height) * 0.9,
-          MAX_SCALE
+          state.canvasEditorState.maxScale
         )
       )
-    ) : _zoom);
+    ) : state.canvasEditorState.zoom);
   }
+
+
 
   function mouseHandler(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault()
@@ -105,13 +107,74 @@ export function useCanvas() {
       Math.trunc(e.nativeEvent.offsetY / zoom())
     );
 
-    if (e.buttons === 1) {
-      draw(x, y)
-    } else if (e.buttons === 2) {
-      // fill(x, y)
-      setColor(state.canvas.pick(x, y))
+
+    const prevColor = state.canvas.pick(x, y)
+    const prevOperation = operations.at(-1)
+
+    if (e.buttons === 2) {
+      setColor(prevColor)
+      return
+    }
+
+    const newOperation = {
+      color: state.canvasEditorState.activeColor,
+      tool: state.canvasEditorState.activeTool,
+      y,
+      x,
+    }
+    if (
+      prevOperation
+      && prevOperation.x === newOperation.x
+      && prevOperation.y === newOperation.y
+      && prevOperation.color === newOperation.color
+      && prevOperation.tool === newOperation.tool
+    ) return
+
+    if (operations.some(
+      op => op
+        && op.x === newOperation.x
+        && op.y === newOperation.y
+        && op.color === newOperation.color
+        && op.tool === newOperation.tool
+    )) return
+    if (
+      prevColor === state.canvasEditorState.activeColor
+      && state.canvasEditorState.activeTool === Tool.DRAW
+    ) return
+
+    setOperations(prev => [...prev, newOperation])
+  }
+
+
+  React.useEffect(() => {
+    requestAnimationFrame(processOperations);
+  }, [operations])
+
+  function processOperations() {
+    if (operations.length > 0 && state.canvas) {
+      for (let i = currentOperation; i < operations.length; i++) {
+
+        const operation = operations[i]
+
+        switch (operation.tool) {
+          case Tool.DRAW:
+            draw(operation.x, operation.y, operation.color);
+            break;
+          case Tool.FILL:
+            fill(operation.x, operation.y);
+            break;
+          case Tool.FILL_ALL:
+            fillAll(operation.x, operation.y);
+            break;
+          default:
+            break;
+        }
+      }
+      setCurrentOperation(operations.length)
     }
   }
+
+
 
   function mouseDown(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault()
@@ -124,95 +187,38 @@ export function useCanvas() {
   function mouseUp(e: React.MouseEvent<HTMLCanvasElement>) {
     e.preventDefault()
     if (!ref.current || !state.canvas) return
-    if (enableFill && state.mode === Mode.DRAW) {
+    if (state.canvasEditorState.enableFill && state.mode === Mode.DRAW) {
       const ctx = getContext2D(ref.current)
       setImageData(ctx.getImageData(0, 0, state.canvas.width, state.canvas.height))
     }
     setEnableFill(false)
+    setOperations([])
+    setCurrentOperation(0)
   }
 
-  function draw(x: number, y: number) {
-    if (!ref.current) return
+  function draw(x: number, y: number, color: HexColor = state.canvasEditorState.activeColor) {
+    if (!ref.current || !state.canvas) return
     const ctx = getContext2D(ref.current)
     if (!ctx) return
 
-    if (state.canvasEditorState?.activeColor && !palette.includes(state.canvasEditorState?.activeColor)) {
-      setPalette(prev => [...prev, state.canvasEditorState?.activeColor])
-    }
-
-    ctx.fillStyle = state.canvasEditorState?.activeColor
-    ctx.fillRect(x * size, y * size, size, size)
-  }
-
-  function fill(x: number, y: number) {
-    if (!state.canvas) return
-
-    const queue = [[x, y]];
-    const startColor = state.canvas.pick(x, y);
-    const dirtyArea = { left: x, top: y, right: x, bottom: y };
-
-    if (state.canvas.pick(x, y) === state.canvasEditorState.activeColor) {
-      return null;
-    }
-
-    let cur: number[] | undefined = []
-    while ((cur = queue.pop())) {
-      if (!cur) break
-
-      const [cx, cy] = cur;
-      const currentColor = state.canvas.pick(cx, cy);
-
-      if (currentColor !== startColor || currentColor === state.canvasEditorState.activeColor) {
-        continue;
-      }
-
-      draw(cx, cy);
-      dirtyArea.left = Math.min(dirtyArea.left, cx);
-      dirtyArea.right = Math.max(dirtyArea.right, cx);
-      dirtyArea.top = Math.min(dirtyArea.top, cy);
-      dirtyArea.bottom = Math.max(dirtyArea.bottom, cy);
-
-      if (cx > 0) {
-        queue.push([cx - 1, cy]);
-      }
-      if (cx < state.canvas.imageData.width - 1) {
-        queue.push([cx + 1, cy]);
-      }
-      if (cy > 0) {
-        queue.push([cx, cy - 1]);
-      }
-      if (cy < state.canvas.imageData.height - 1) {
-        queue.push([cx, cy + 1]);
-      }
-    }
-
-    return dirtyArea;
+    state.canvas.redraw(state.canvas.imageData.draw(x, y, color))
   }
 
   function fillAll(x: number, y: number) {
     if (!state.canvas) return
-    return replaceColor(state.canvas.pick(x, y));
-  }
-
-  function replaceColor(originalColor: HexColor) {
-    if (!state.imageData || !state.canvas) return
-    const dirtyArea = { left: 0, top: 0, right: 0, bottom: 0 };
-    for (let x = 0; x < state.imageData.width; x++) {
-      for (let y = 0; y < state.imageData.height; y++) {
-        const color = state.canvas.pick(x, y);
-        if (color === originalColor) {
-          draw(x, y);
-          dirtyArea.left = Math.min(dirtyArea.left, x);
-          dirtyArea.right = Math.max(dirtyArea.right, x);
-          dirtyArea.top = Math.min(dirtyArea.top, y);
-          dirtyArea.bottom = Math.max(dirtyArea.bottom, y);
-        }
-      }
+    const dirtyArea: DirtyArea | undefined = state.canvas.imageData.fillAll(x, y, state.canvasEditorState.activeColor)
+    if (dirtyArea) {
+      state.canvas.redraw(dirtyArea)
     }
-    return dirtyArea;
-
   }
 
+  function fill(x: number, y: number) {
+    if (!state.canvas) return
+    const dirtyArea: DirtyArea | undefined = state.canvas.imageData.fill(x, y, state.canvasEditorState.activeColor)
+    if (dirtyArea) {
+      state.canvas.redraw(dirtyArea)
+    }
+  }
 
   function uploadImage(event: React.ChangeEvent<HTMLInputElement>) {
     const file = event?.target.files?.[0]
@@ -227,6 +233,13 @@ export function useCanvas() {
     reader.readAsDataURL(file)
   }
 
+  function setTool(tool: Tool) {
+    setCanvasState({
+      ...state.canvasEditorState,
+      activeTool: tool
+    })
+  }
+
   function processImage(imageData: string) {
     if (!ref.current) return
     const ctx = getContext2D(ref.current)
@@ -234,7 +247,6 @@ export function useCanvas() {
 
     const image = new Image()
     image.src = imageData
-
     image.onload = () => {
       ctx.drawImage(image, 0, 0)
     }
@@ -246,7 +258,7 @@ export function useCanvas() {
     if (!ctx) return
 
     ctx.fillStyle = state.canvas.pick(x, y)
-    ctx.fillRect(x * size, y * size, size, size)
+    ctx.fillRect(x * state.canvasEditorState.size, y * state.canvasEditorState.size, state.canvasEditorState.size, state.canvasEditorState.size)
   }
 
   React.useEffect(() => {
@@ -257,18 +269,18 @@ export function useCanvas() {
 
   React.useEffect(() => {
     zoomToFit()
-  }, [state.mode])
+  }, [state.mode, state.originalImageData])
 
   return {
     mouseMove,
     mouseDown,
     ref,
     setColor,
-    palette,
     uploadImage,
     zoomIn,
     zoomOut,
     zoomToFit,
-    mouseUp
+    mouseUp,
+    setTool
   }
 }

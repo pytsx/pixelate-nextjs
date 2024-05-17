@@ -22,6 +22,7 @@
  */
 
 export function toHex(a) {
+  if (!a) return '00';
   return a.toString(16).padStart(2, '0');
 }
 export function rgbToHex(r, g, b) {

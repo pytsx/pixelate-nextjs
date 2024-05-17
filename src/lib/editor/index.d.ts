@@ -22,12 +22,12 @@
  */
 
 import { EditableCanvas, EditableImageData } from "../image"
-import { EditorState } from "./reducer"
+import { CanvasEditorState, EditorState } from "./reducer"
 
-export interface EngineContextProps {
+export interface EditorContextProps {
   openImageFile(file: File): Promise<void>
   newFile(): void
-  openDrawMode(image: HTMLImageElement | EditableImageData): void
+  openDrawMode(): void
   uploadFile(): void
   downloadPng(): Promise<void>
   copyImage(): Promise<void>
@@ -45,15 +45,15 @@ export interface EngineContextProps {
   hasImage: () => Boolean
 }
 
-declare const EngineContext: React.Context<EngineContextProps>
+declare const EditorContext: React.Context<EditorContextProps>
 
 export const EditorProvider: (props: { children: React.ReactNode }) => JSX.Element
-export const useEditor: () => EngineContextProps
+export const useEditor: () => EditorContextProps
 
 export enum Tool {
   DRAW,
   FILL,
-  MAGIC_WAND
+  FILL_ALL
 }
 
 export enum Mode {
@@ -69,10 +69,7 @@ export interface InstructionsState {
   crossedOutColumns: Set<number>
 }
 
-export interface CanvasEditorState {
-  activeColor: HexColor
-  activeTool: Tool
-}
+
 
 export type PersistableState = | { mode: Mode.NEW } | EditorState
 

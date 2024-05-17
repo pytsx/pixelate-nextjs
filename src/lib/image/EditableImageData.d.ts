@@ -21,6 +21,7 @@
  * Copyright 2022 Google LLC
  */
 
+import { DirtyArea } from "../utils"
 import { HexColor } from "./EditableCanvas"
 
 declare export class EditableImageData {
@@ -37,10 +38,10 @@ declare export class EditableImageData {
   public get counter(): ReadonlyMap<HexColor, number>
   public get pixels(): ReadonlyArray<ReadonlyArray<HexColor>>
 
-  public draw(x: number, y: number, fillColor: HexColor): void
-  public fill(x: number, y: number, fillColor: HexColor): DirtyArea | null
-  public fillAll(x: number, y: number, fillColor: HexColor): DirtyArea | null
-  public replaceColor(originalColor: HexColor, fillColor: HexColor): DirtyArea | null
+  public draw(x: number, y: number, fillColor: HexColor): DirtyArea | undefined
+  public fill(x: number, y: number, fillColor: HexColor): DirtyArea | undefined
+  public fillAll(x: number, y: number, fillColor: HexColor): DirtyArea | undefined
+  public replaceColor(originalColor: HexColor, fillColor: HexColor): DirtyArea | undefined
   public toDataURL(): string
   public toPngBlob(): Promise<Blob>
   public toImg(): HTMLImageElement

@@ -24,6 +24,19 @@
 import { produce } from "immer"
 import { EditableImageData } from "../image"
 
+export const Mode = {
+  NEW: "n",
+  PREPROCESS: "p",
+  DRAW: "d",
+  ASSEMBLE: "a"
+}
+
+export const Tool = {
+  DRAW: "DRAW",
+  FILL: "FILL",
+  FILL_ALL: "FILL_ALL"
+}
+
 export function editorReducer(state, action) {
   return produce(state, (draft) => {
     switch (action.type) {
@@ -68,23 +81,20 @@ export function editorReducer(state, action) {
   })
 }
 
-export const Tool = {
-  DRAW: "DRAW",
-  FILL: "FILL",
-  MAGIC_WAND: "MAGIC_WAND"
-}
-
 export const initialEditorState = {
   mode: "n",
   canvasEditorState: {
     activeColor: "#000000",
     activeTool: Tool.DRAW,
+    maxScale: 23,
+    size: 1,
+    zoom: 1,
+    palette: [],
+    enableFill: false
   },
   instructionsState: {
     tool: Tool.DRAW,
     color: "#000000",
-    size: 1,
-    tolerance: 0
   },
   imageData: null,
   canvas: null,

@@ -15,7 +15,7 @@ import Stack from "@mui/material/Stack"
 import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle"
 import DialogActions from "@mui/material/DialogActions"
-import { Divider, MenuItem, Typography } from "@mui/material"
+import { Divider, MenuItem } from "@mui/material"
 import Image from "next/image"
 
 export function AppAppBar() {
@@ -24,7 +24,8 @@ export function AppAppBar() {
     newFile,
     setMode,
     downloadPng,
-    uploadFile
+    uploadFile,
+
   } = useEditor()
 
   const [open, setOpen] = React.useState(false);
@@ -65,6 +66,7 @@ export function AppAppBar() {
           }}
         >
           <Image
+            onClick={newFile}
             src="/logo.png"
             alt="logo"
             width={64}
@@ -107,7 +109,7 @@ export function AppAppBar() {
           >
             <DialogTitle>File</DialogTitle>
             <MenuItem
-              disabled={!!!state.imageData}
+
               onClick={() => {
                 newFile()
                 uploadFile()

@@ -24,18 +24,14 @@
 "use client"
 
 import React from "react"
-import { downloadFile, loadImageFile, showFileDialog } from "../io"
-import { EditableImageData, getImageData, hasImageData } from "../image"
-import { editorReducer, initialEditorState } from "./reducer"
+import { downloadFile, loadImageFile, showFileDialog, waitForImage } from "../io"
+import { EditableCanvas, EditableImageData, getImageData, hasImageData } from "../image"
+import { editorReducer, initialEditorState, Mode, Tool } from "./reducer"
+import { createCanvas, getContext2D } from "../utils"
+export { Mode, Tool }
 
 const EditorContext = React.createContext({})
 
-export const Mode = {
-  NEW: "n",
-  PREPROCESS: "p",
-  DRAW: "d",
-  ASSEMBLE: "a"
-}
 
 export const EditorProvider = (props) => {
   const [state, dispatch] = React.useReducer(editorReducer, initialEditorState)
@@ -97,16 +93,9 @@ export const EditorProvider = (props) => {
     dispatch({ type: "RESET" })
   }
 
-  function openDrawMode(image) {
-    console.log(image)
-    const imageData = new EditableImageData(getImageData(image));
-
-    dispatch({
-      type: "SET_IMAGE_DATA",
-      payload: {
-        value: imageData
-      }
-    })
+  function openDrawMode() {
+    setImageData(new ImageData(80, 80))
+    setMode(Mode.PREPROCESS)
   }
 
   function uploadFile() {
@@ -198,7 +187,7 @@ export const useEditor = () => {
   const context = React.useContext(EditorContext)
 
   if (!context) {
-    throw new Error("useEditor must be used within an EngineProvider")
+    throw new Error("useEditor must be used within an EditorProvider")
   }
 
   return context

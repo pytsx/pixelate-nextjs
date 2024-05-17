@@ -51,12 +51,16 @@ export class EditableImageData {
   }
 
   pick(x, y) {
-    const i = this.toIndex(x, y)
-    return rgbToHex(
-      this._imageData.data[i + 0],
-      this._imageData.data[i + 1],
-      this._imageData.data[i + 2]
-    )
+    const i = this.toIndex(x, y) || 0
+    try {
+      return rgbToHex(
+        this._imageData.data[i + 0],
+        this._imageData.data[i + 1],
+        this._imageData.data[i + 2]
+      )
+    } catch (error) {
+      return "#1d1d1d"
+    }
   }
 
   draw(x, y, fillColor) {
@@ -74,6 +78,7 @@ export class EditableImageData {
     this.imageData.data[i + 3] = 255;
     this._pixels[y][x] = fillColor;
     const previousCount = (this._counter.get(previous) || 0) - 1;
+
     if (previousCount <= 0) {
       this._counter.delete(previous);
     } else {
@@ -84,68 +89,65 @@ export class EditableImageData {
     return { left: x, top: y, right: x, bottom: y };
   }
 
-  // fill(x, y, fillColor) {
-  //   let cur = []
-  //   const queue = [[x, y]];
-  //   const startColor = this.pick(x, y);
-  //   const dirtyArea = { left: x, top: y, right: x, bottom: y };
+  fill(x, y, fillColor) {
+    let cur = []
+    const queue = [[x, y]];
+    const startColor = this.pick(x, y);
+    const dirtyArea = { left: x, top: y, right: x, bottom: y };
 
-  //   if (this.pick(x, y) === fillColor) {
-  //     return null;
-  //   }
+    if (this.pick(x, y) === fillColor) {
+      return null;
+    }
 
-  //   while ((cur = queue.pop())) {
-  //     const [cx, cy] = cur;
-  //     const currentColor = this.pick(cx, cy);
+    while ((cur = queue.pop())) {
+      const [cx, cy] = cur;
+      const currentColor = this.pick(cx, cy);
 
-  //     if (currentColor !== startColor || currentColor === fillColor) {
-  //       continue;
-  //     }
+      if (currentColor !== startColor || currentColor === fillColor) {
+        continue;
+      }
 
-  //     this.draw(cx, cy, fillColor);
-  //     dirtyArea.left = Math.min(dirtyArea.left, cx);
-  //     dirtyArea.right = Math.max(dirtyArea.right, cx);
-  //     dirtyArea.top = Math.min(dirtyArea.top, cy);
-  //     dirtyArea.bottom = Math.max(dirtyArea.bottom, cy);
+      this.draw(cx, cy, fillColor);
+      dirtyArea.left = Math.min(dirtyArea.left, cx);
+      dirtyArea.right = Math.max(dirtyArea.right, cx);
+      dirtyArea.top = Math.min(dirtyArea.top, cy);
+      dirtyArea.bottom = Math.max(dirtyArea.bottom, cy);
 
-  //     if (cx > 0) {
-  //       queue.push([cx - 1, cy]);
-  //     }
-  //     if (cx < this.imageData.width - 1) {
-  //       queue.push([cx + 1, cy]);
-  //     }
-  //     if (cy > 0) {
-  //       queue.push([cx, cy - 1]);
-  //     }
-  //     if (cy < this.imageData.height - 1) {
-  //       queue.push([cx, cy + 1]);
-  //     }
-  //   }
+      if (cx > 0) {
+        queue.push([cx - 1, cy]);
+      }
+      if (cx < this.imageData.width - 1) {
+        queue.push([cx + 1, cy]);
+      }
+      if (cy > 0) {
+        queue.push([cx, cy - 1]);
+      }
+      if (cy < this.imageData.height - 1) {
+        queue.push([cx, cy + 1]);
+      }
+    }
 
-  //   return dirtyArea;
-  // }
+    return dirtyArea;
+  }
 
-  // fillAll(x, y, fillColor) {
-  //   return this.replaceColor(this.pick(x, y), fillColor);
-  // }
+  fillAll(x, y, fillColor) { return this.replaceColor(this.pick(x, y), fillColor) }
 
-  // replaceColor(originalColor, fillColor) {
-  //   const dirtyArea = { left: 0, top: 0, right: 0, bottom: 0 };
-  //   for (let x = 0; x < this.imageData.width; x++) {
-  //     for (let y = 0; y < this.imageData.height; y++) {
-  //       const color = this.pick(x, y);
-  //       if (color === originalColor) {
-  //         this.draw(x, y, fillColor);
-  //         dirtyArea.left = Math.min(dirtyArea.left, x);
-  //         dirtyArea.right = Math.max(dirtyArea.right, x);
-  //         dirtyArea.top = Math.min(dirtyArea.top, y);
-  //         dirtyArea.bottom = Math.max(dirtyArea.bottom, y);
-  //       }
-  //     }
-  //   }
-  //   return dirtyArea;
-
-  // }
+  replaceColor(originalColor, fillColor) {
+    const dirtyArea = { left: 0, top: 0, right: 0, bottom: 0 };
+    for (let x = 0; x < this.imageData.width; x++) {
+      for (let y = 0; y < this.imageData.height; y++) {
+        const color = this.pick(x, y);
+        if (color === originalColor) {
+          this.draw(x, y, fillColor);
+          dirtyArea.left = Math.min(dirtyArea.left, x);
+          dirtyArea.right = Math.max(dirtyArea.right, x);
+          dirtyArea.top = Math.min(dirtyArea.top, y);
+          dirtyArea.bottom = Math.max(dirtyArea.bottom, y);
+        }
+      }
+    }
+    return dirtyArea;
+  }
 
   toDataURL() {
     const canvas = createCanvas(this);
