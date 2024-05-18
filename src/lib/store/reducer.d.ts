@@ -20,48 +20,57 @@
  * 
  * Copyright 2022 Google LLC
  */
-import {InstructionsState as IS} from "@/lib/editor"
 
-export interface InstructionsState {
-  textClasses: Map<HexColor, string>
-  indices: Map<HexColor, string>
-  colors: { color: HexColor; index: string; count: number }[]
-  instructions: IS
+import { Mode } from "../editor"
+import { CanvasEditorState } from "../editor/reducer"
+import { EditableCanvas, EditableImageData } from "../image"
+
+
+export interface StoreState {
+  mode: Mode
+  canvasEditorState: CanvasEditorState
+  imageData: EditableImageData | null
+  originalImageData: EditableImageData | null
+  canvas: EditableCanvas | null
 }
 
-export type InstructionsActions =
+export const initialStoreState: StoreState
+
+export type StoreActions =
   | {
-    type: "TOGGLE_CROSSED_COLOR"
+    type: "LOAD_DATA"
     payload: {
-      value: HexColor
+      value: StoreState
     }
   } | {
-    type: "TOGGLE_CROSSED_ROW"
+    type: "SET_MODE",
     payload: {
-      value: number
+      value: StoreState["mode"] | null
     }
   } | {
-    type: "TOGGLE_CROSSED_COLUMN"
+    type: "SET_IMAGE_DATA",
     payload: {
-      value: number
+      value: StoreState["imageData"] | null
     }
   } | {
-    type: "SET_INDICE"
+    type: "SET_CANVAS_EDITOR_STATE",
     payload: {
-      key: HexColor
-      value: string
+      value: StoreState["canvasEditorState"] | null
     }
   } | {
-    type: "SET_TEXT_CLASS"
+    type: "SET_CANVAS",
     payload: {
-      key: HexColor
-      value: string
+      value: StoreState["canvas"] | null
     }
   } | {
-    type: "SET_COLOR"
+    type: "RESET"
+  } | {
+    type: "SET_CANVAS_IMAGE_DATA"
     payload: {
-      value: { color: HexColor; index: string; count: number }
+      value: StoreState["imageData"]
     }
+  } | {
+    type: "RESET_IMAGE_DATA"
   }
 
-export function instructionsReducer(state: InstructionsState, action: InstructionsActions): InstructionsState
+export function storeReducer(state: StoreState, action: StoreActions): StoreState 

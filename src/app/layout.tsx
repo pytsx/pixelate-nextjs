@@ -33,7 +33,7 @@ import CssBaseline from "@mui/material/CssBaseline";
 
 import theme from "./theme";
 import colorSchemeScript from "./getInitialColorScript";
-import { EditorProvider } from "@/lib";
+import { StoreProvider } from "@/lib/store";
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -62,9 +62,9 @@ export default function RootLayout({
             disableTransitionOnChange
           >
               <CssBaseline />
-            <EditorProvider>
+            <StoreProvider>
               {children}
-            </EditorProvider>
+            </StoreProvider>
           </CssVarsProvider>
         </AppRouterCacheProvider>
       </body>

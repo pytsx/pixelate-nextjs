@@ -24,27 +24,20 @@
 import { produce } from "immer"
 import { EditableImageData } from "../image"
 
-export const Mode = {
-  NEW: "n",
-  PREPROCESS: "p",
-  DRAW: "d",
-  ASSEMBLE: "a"
-}
 
-export const Tool = {
-  DRAW: "DRAW",
-  FILL: "FILL",
-  FILL_ALL: "FILL_ALL"
-}
-
-export function editorReducer(state, action) {
+export function storeReducer(state, action) {
   return produce(state, (draft) => {
     switch (action.type) {
+      case "LOAD_DATA":
+        draft = {
+          ...draft,
+          ...action.payload.value
+        }
+        break
       case "SET_MODE":
         draft.mode = action.payload.value
         break
       case "SET_IMAGE_DATA":
-        draft.history.push({ ...state })
         const imageData = new EditableImageData(action.payload.value)
         if (!state.imageData || state.mode == "n") {
           draft.originalImageData = imageData
@@ -57,16 +50,12 @@ export function editorReducer(state, action) {
       case "SET_CANVAS_EDITOR_STATE":
         draft.canvasEditorState = action.payload.value
         break
-      case "SET_INSTRUCTIONS_STATE":
-        draft.instructionsState = action.payload.value
-        break
       case "RESET":
         draft.imageData = null
         draft.canvas = null
         draft.history = []
         draft.mode = "n"
-        draft.canvasEditorState = initialEditorState.canvasEditorState
-        draft.instructionsState = initialEditorState.instructionsState
+        draft.canvasEditorState = initialStoreState.canvasEditorState
         draft.originalImageData = null
       case "RESET_IMAGE_DATA":
         draft.imageData = draft.originalImageData
@@ -81,22 +70,17 @@ export function editorReducer(state, action) {
   })
 }
 
-export const initialEditorState = {
+export const initialStoreState = {
   mode: "n",
   canvasEditorState: {
     activeColor: "#000000",
-    activeTool: Tool.DRAW,
+    activeTool: "DRAW",
     maxScale: 23,
     size: 1,
     zoom: 1,
     palette: [],
     enableFill: false
   },
-  instructionsState: {
-    tool: Tool.DRAW,
-    color: "#000000",
-  },
   imageData: null,
   canvas: null,
-  history: []
 }

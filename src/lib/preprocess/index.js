@@ -24,49 +24,49 @@
 import React from 'react';
 import { EditableImageData, downscale } from '../image';
 import { getContext2D, requireNonNull } from '../utils';
-import { useEditor } from '../editor';
+import { useStore } from '../store';
 
 export function usePreprocess() {
-  const { state } = useEditor()
+  const { store, setCanvasImageData } = useStore()
   const minTargetWidth = 8
 
   const [targetColors, _setTargetColors] = React.useState(30)
   const [targetWidth, _setTargetWidth] = React.useState(minTargetWidth)
 
   React.useEffect(() => {
-    if (state.imageData) {
+    if (store.imageData) {
       ngOnInit()
     }
-  }, [state.imageData])
+  }, [store.imageData])
 
   React.useEffect(() => {
-    if (state.imageData && state.canvas) {
+    if (store.imageData && store.canvas) {
       ngOnChanges()
     }
-  }, [targetWidth, targetColors, state.canvas])
+  }, [targetWidth, targetColors, store.canvas])
 
 
   const setTargetWidth = (value) => _setTargetWidth(value)
   const setTargetColor = (value) => _setTargetColors(value)
 
-  const maxTargetColors = () => Math.min(30, state.imageData?.counter.size || 30);
+  const maxTargetColors = () => Math.min(30, store.imageData?.counter.size || 30);
 
   const targetHeight = () => {
     return Math.round(
-      (state.imageData?.height / state.imageData?.width) * targetWidth
+      (store.imageData?.height / store.imageData?.width) * targetWidth
     );
   }
 
   const maxTargetWidth = () => {
-    return Math.min(80, (state.imageData?.width || 80))
+    return Math.min(80, (store.imageData?.width || 80))
   }
 
   const realWidth = () => Math.floor(targetWidth * 7.6);
   const realHeight = () => Math.floor(targetHeight() * 7.6);
 
   const ngOnInit = () => {
-    requireNonNull(state.imageData);
-    let _targetWidth = state.imageData.width;
+    requireNonNull(store.imageData);
+    let _targetWidth = store.imageData.width;
 
     if (_targetWidth === 0) {
       throw new Error('targetWidth is 0');
@@ -84,10 +84,10 @@ export function usePreprocess() {
   const ngOnChanges = () => {
     const canvas = document.querySelector('canvas')
     const ctx = getContext2D(canvas)
-    if (!canvas || !ctx || !state.imageData) return;
+    if (!canvas || !ctx || !store.imageData) return;
 
     const _targetHeight = Math.round(
-      (state.imageData?.height / state.imageData?.width) * targetWidth
+      (store.imageData?.height / store.imageData?.width) * targetWidth
     );
 
     ctx.canvas.width = targetWidth;
@@ -99,10 +99,11 @@ export function usePreprocess() {
       ctx.getImageData(0, 0, targetWidth, _targetHeight)
     )
 
-    downscale(state.imageData, scaledImageData, targetColors);
+    downscale(store.imageData, scaledImageData, targetColors);
 
     ctx.putImageData(scaledImageData.imageData, 0, 0);
-    state.canvas.setImageData(scaledImageData)
+
+    setCanvasImageData(scaledImageData)
   }
 
   return {

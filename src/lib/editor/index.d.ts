@@ -24,31 +24,20 @@
 import { EditableCanvas, EditableImageData } from "../image"
 import { CanvasEditorState, EditorState } from "./reducer"
 
-export interface EditorContextProps {
+export interface IEditor {
   openImageFile(file: File): Promise<void>
   newFile(): void
   openDrawMode(): void
   uploadFile(): void
   downloadPng(): Promise<void>
   copyImage(): Promise<void>
-  setCanvas(editableCanvas: EditableCanvas): void
-  setCanvasState(canvasState: CanvasEditorState): void
-  setInstructionsState(instructionsState: InstructionsState): void
-  setMode(mode: Mode): void
-  setImageData(imageData: ImageData): void
-  undo(): void
-  setCanvasImageData(imageData: EditableImageData): void
-  resetImageData(): void
-  state: EditorState
   //getters
   isMobile: () => Boolean
   hasImage: () => Boolean
 }
 
-declare const EditorContext: React.Context<EditorContextProps>
 
-export const EditorProvider: (props: { children: React.ReactNode }) => JSX.Element
-export const useEditor: () => EditorContextProps
+export const useEditor: () => IEditor
 
 export enum Tool {
   DRAW,
@@ -62,13 +51,6 @@ export enum Mode {
   DRAW = "d",
   ASSEMBLE = "a"
 }
-
-export interface InstructionsState {
-  crossedOutColors: Set<HexColor>
-  crossedOutRows: Set<number>
-  crossedOutColumns: Set<number>
-}
-
 
 
 export type PersistableState = | { mode: Mode.NEW } | EditorState

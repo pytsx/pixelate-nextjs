@@ -1,43 +1,63 @@
+/**
+ * Copyright 2024 Henrique de Lima Pessoa
+ * 
+ * See the NOTICE file distributed with this work for 
+ * additional information regarding copyright ownership.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ * 
+ *    https://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ * 
+ * This project is based on https://github.com/google/pixelate which is licensed under the Apache 2.0 License.
+ * 
+ * Copyright 2022 Google LLC
+ */
 
 "use client"
 
 import React from "react"
+import Image from "next/image"
 
 import AppBar from "@mui/material/AppBar"
 import Button from "@mui/material/Button"
 import Toolbar from "@mui/material/Toolbar"
 import Tab from "@mui/material/Tab"
 import TabList from "@mui/lab/TabList"
-
-import { ModeSwitcher } from "./ModeSwitcher"
-import { Mode, useEditor } from "@/lib"
 import Stack from "@mui/material/Stack"
 import Dialog from "@mui/material/Dialog"
 import DialogTitle from "@mui/material/DialogTitle"
 import DialogActions from "@mui/material/DialogActions"
-import { Divider, MenuItem } from "@mui/material"
-import Image from "next/image"
+import Divider from "@mui/material/Divider"
+import MenuItem from "@mui/material/MenuItem"
+
+import { Mode, useEditor, useStore } from "@/lib"
+
+import { ModeSwitcher } from "./ModeSwitcher"
 
 export function AppAppBar() {
+
   const {
-    state,
     newFile,
-    setMode,
     downloadPng,
     uploadFile,
-
   } = useEditor()
 
-  const [open, setOpen] = React.useState(false);
+  const {
+    setMode,
+    store
+  } = useStore()
 
-  const openDialog = () => {
-    setOpen((prevOpen) => !prevOpen);
-
-  };
-
-  const closeDialog = () => {
-    setOpen(false);
-  };
+  const [open, setOpen] = React.useState(false)
+  const openDialog = () => { setOpen((prevOpen) => !prevOpen) }
+  const closeDialog = () => { setOpen(false) }
 
   return (
     <AppBar
@@ -122,7 +142,7 @@ export function AppAppBar() {
             <Divider />
 
             <MenuItem
-              disabled={!state.imageData}
+              disabled={!store.imageData}
               onClick={() => {
                 downloadPng()
                 closeDialog()
@@ -142,8 +162,8 @@ export function AppAppBar() {
           </Dialog>
         </Stack>
 
-        {state.imageData
-          && state.mode !== Mode.NEW
+        {store.imageData
+          && store.mode !== Mode.NEW
           && <TabList
             onChange={(e, value) => setMode(value)}
           >

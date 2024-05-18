@@ -16,9 +16,8 @@ hooks:
     # Os hooks são usados como máquinas que, ao acoplar com outras máquinas, geram um fluxo de dados.
     # O provedor do sistema (e.g. EditorProvider) é acompanhado por um hook (e.g. useEditor) que fornece o estado mais geral do sistema. 
     # Os hooks subsequentes são máquinas especialistas que manipulas uma parcela específica dos dados do hook geral (e.g. useEditor):
-    # e.g. usePreprocess <- não tem seu próprio useReducer
-    # e.g. useCanvas <- tem seu próprio useReducer
-    # e.g. useInstructions <- tem seu próprio useReducer
+    # e.g. usePreprocess 
+    # e.g. useCanvas 
   - regras: 
     1 - dê preferência para o uso de useReducer em detrimentos do useState
       1.1 - o useReducer recebe como valor inicial uma parcela de dados de outro hook mais geral; 

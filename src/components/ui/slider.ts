@@ -24,9 +24,10 @@
 "use client"
 
 import { default as MuiSlider } from "@mui/material/Slider";
+
 import { styled } from "@mui/material/styles";
 
-export const Slider = styled(MuiSlider)(({ theme }) => ({
+const Slider = styled(MuiSlider)(({ theme }) => ({
   height: "100%",
   cursor: "grab",
   '& .MuiSlider-track': {
@@ -73,3 +74,9 @@ export const Slider = styled(MuiSlider)(({ theme }) => ({
     },
   },
 }));
+
+Slider.displayName = "Slider"
+
+export {
+  Slider
+}

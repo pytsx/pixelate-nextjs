@@ -22,7 +22,7 @@
  */
 
 import { Mode, PersistableState } from "../editor"
-import { EditorState } from "../editor/reducer"
+import { StoreState } from "../store/reducer"
 import { HexColor, createCanvas, getContext2D, hexToRgb, min, requireNonNull } from "../utils"
 import { EditableImageData } from "./EditableImageData"
 
@@ -89,7 +89,7 @@ export function colorDistance(a: HexColor, b: HexColor) {
 }
 
 
-export function hasImageData(state: PersistableState): state is EditorState {
+export function hasImageData(state: PersistableState): state is StoreState {
   return (
     state.mode === Mode.DRAW ||
     state.mode === Mode.PREPROCESS ||

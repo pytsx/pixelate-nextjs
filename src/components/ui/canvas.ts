@@ -26,7 +26,7 @@
 import Box from "@mui/material/Box";
 import { styled } from "@mui/material/styles";
 
-export const CanvasRoot = styled("canvas", {
+const CanvasRoot = styled("canvas", {
   name: "canvas",
   slot: "root",
 })(({ theme }) => ({
@@ -35,7 +35,9 @@ export const CanvasRoot = styled("canvas", {
   borderRadius: "4px",
 }))
 
-export const CanvasBox = styled(Box)(({ theme }) => ({
+CanvasRoot.displayName = "CanvasRoot"
+
+const CanvasBox = styled(Box)(({ theme }) => ({
   maxHeight: "calc(100vh - 3.2rem)",
   height: "100%",
   maxWidth: "100vw",
@@ -51,3 +53,10 @@ export const CanvasBox = styled(Box)(({ theme }) => ({
     justifyContent: "flex-start",
   }
 }))
+
+CanvasBox.displayName = "CanvasBox"
+
+export {
+  CanvasRoot,
+  CanvasBox
+}

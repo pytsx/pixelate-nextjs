@@ -21,30 +21,19 @@
  * Copyright 2022 Google LLC
  */
 
-"use client"
+import { StoreState } from "./reducer";
 
-import React from "react"
-
-import IconButton from "@mui/material/IconButton"
-
-import { useColorScheme } from "@mui/material/styles"
-
-export const ModeSwitcher = () => {
-  const { setMode, mode } = useColorScheme()
-
-  const [mounted, setMounted] = React.useState<boolean>(false)
-
-  const toggleMode = () => setMode(mode !== "dark" ? "dark" : "light")
-
-  React.useEffect(() => setMounted(true), [])
-
-  if (!mounted) {
-    // for ssr
-    return <div style={{ height: "3rem", width: "3rem" }} />
-  }
-  return (
-    <IconButton onClick={toggleMode} >
-      {mode == "dark" ? "🌞" : "🌜"}
-    </IconButton>
-  )
+interface StoreContext {
+  store: StoreState
+  loadData(value: StoreState): void,
+  reset(): void,
+  setCanvas(editableCanvas: StoreState["canvas"]): void,
+  setImageData(imageData: ImageData): void,
+  setCanvasState(canvasState: StoreState["canvasEditorState"]): void,
+  setMode(mode: StoreState["mode"]): void,
+  setCanvasImageData(imageData: ImageData): void,
+  resetImageData(): void
 }
+
+export function StoreProvider(props: React.PropsWithChildren): JSX.Element
+export function useStore(): StoreContext

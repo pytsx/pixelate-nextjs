@@ -21,132 +21,63 @@
  * Copyright 2022 Google LLC
  */
 
-"use client"
+import { downloadFile, loadImageFile, showFileDialog } from "../io"
+import { getImageData, hasImageData } from "../image"
+import { useStore } from "../store"
 
-import React from "react"
-import { downloadFile, loadImageFile, showFileDialog, waitForImage } from "../io"
-import { EditableCanvas, EditableImageData, getImageData, hasImageData } from "../image"
-import { editorReducer, initialEditorState, Mode, Tool } from "./reducer"
-import { createCanvas, getContext2D } from "../utils"
-export { Mode, Tool }
+export const Mode = {
+  NEW: "n",
+  PREPROCESS: "p",
+  DRAW: "d",
+  ASSEMBLE: "a"
+}
 
-const EditorContext = React.createContext({})
+export const Tool = {
+  DRAW: "DRAW",
+  FILL: "FILL",
+  FILL_ALL: "FILL_ALL"
+}
 
 
-export const EditorProvider = (props) => {
-  const [state, dispatch] = React.useReducer(editorReducer, initialEditorState)
+export const useEditor = () => {
+  const {
+    store,
+    setMode,
+    setImageData,
+    reset,
+  } = useStore()
 
   async function openImageFile(file) {
-    dispatch({
-      type: "SET_MODE",
-      payload: {
-        value: "p"
-      }
-    })
+    setMode("p")
     const img = await loadImageFile(file)
     const imageData = getImageData(img)
-
-    dispatch({
-      type: "SET_IMAGE_DATA",
-      payload: {
-        value: imageData
-      }
-    })
+    setImageData(imageData)
   }
 
-
-  function setImageData(imageData) {
-    dispatch({
-      type: "SET_IMAGE_DATA",
-      payload: {
-        value: imageData
-      }
-    })
-  }
-
-  function setCanvasImageData(imageData) {
-    dispatch({
-      type: "SET_CANVAS_IMAGE_DATA",
-      payload: {
-        value: imageData
-      }
-    })
-  }
-
-  function resetImageData() {
-    dispatch({
-      type: "RESET_IMAGE_DATA"
-    })
-
-  }
-
-  function setCanvas(editableCanvas) {
-    dispatch({
-      type: "SET_CANVAS",
-      payload: {
-        value: editableCanvas
-      }
-    })
-  }
-
-  function newFile() {
-    dispatch({ type: "RESET" })
-  }
+  function newFile() { reset() }
+  function uploadFile() { showFileDialog((file) => openImageFile(file)) }
+  function copyImage() { }
 
   function openDrawMode() {
-    setImageData(new ImageData(80, 80))
-    setMode(Mode.PREPROCESS)
+    const image = new ImageData(80, 80)
+    image.data.fill(255)
+
+    setImageData(image)
+    setMode("p")
   }
 
-  function uploadFile() {
-    showFileDialog((file) => openImageFile(file))
-  }
 
   async function downloadPng() {
-    if (!hasImageData(state)) {
+    if (!hasImageData(store)) {
       throw new Error('copyImage requires imageData.');
     }
-    const blob = await state.imageData.toPngBlob();
+    const blob = await store.imageData.toPngBlob();
     const date = new Date().toISOString().slice(0, 10);
     const file = new File([blob], `pixelate-${date}.png`);
     downloadFile(file);
   }
 
-  function copyImage() { }
-
-  function setCanvasState(state) {
-    dispatch({
-      type: "SET_CANVAS_EDITOR_STATE",
-      payload: {
-        value: state
-      }
-    })
-  }
-
-  function setInstructionsState(state) {
-    dispatch({
-      type: "SET_INSTRUCTIONS_STATE",
-      payload: {
-        value: state
-      }
-    })
-  }
-
-  function setMode(mode) {
-    dispatch({
-      type: "SET_MODE",
-      payload: {
-        value: mode
-      }
-    })
-    if (mode === Mode.NEW) {
-      newFile()
-    }
-  }
-
-  function undo() {
-
-  }
+  function undo() { }
 
   // getters 
   const isMobile = () => {
@@ -154,41 +85,17 @@ export const EditorProvider = (props) => {
       .getPropertyValue("--mobile")
       .trim() === '1'
   }
-  const hasImage = () => hasImageData(state)
-
-  return (
-    <EditorContext.Provider value={{
-      openImageFile,
-      newFile,
-      openDrawMode,
-      uploadFile,
-      downloadPng,
-      copyImage,
-      isMobile,
-      hasImage,
-      state,
-      setCanvas,
-      setCanvasState,
-      setMode,
-      setInstructionsState,
-      setImageData,
-      undo,
-      setCanvasImageData,
-      resetImageData
-    }}>
-      {props.children}
-    </EditorContext.Provider>
-  )
-}
+  const hasImage = () => hasImageData(store)
 
 
-
-export const useEditor = () => {
-  const context = React.useContext(EditorContext)
-
-  if (!context) {
-    throw new Error("useEditor must be used within an EditorProvider")
+  return {
+    openImageFile,
+    newFile,
+    openDrawMode,
+    uploadFile,
+    downloadPng,
+    copyImage,
+    isMobile,
+    hasImage,
   }
-
-  return context
 }

@@ -24,34 +24,38 @@
 "use client"
 
 import React from "react"
+import Image from "next/image"
+
+import Logo from "../../public/logo.png"
 
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Drawer from "@mui/material/Drawer"
 import IconButton from "@mui/material/IconButton"
-import InputBase from "@mui/material/InputBase"
 import Stack from "@mui/material/Stack"
 import TabContext from "@mui/lab/TabContext"
 import Typography from "@mui/material/Typography"
+import ToggleButton from "@mui/material/ToggleButton"
+import ToggleButtonGroup from "@mui/material/ToggleButtonGroup"
 
 import { getContrastRatio, alpha, darken, lighten } from "@mui/material/styles"
-import { EditableCanvas, Mode, useEditor, useCanvas, usePreprocess, Tool, waitForImage } from "@/lib"
+import { EditableCanvas, Mode, useEditor, useCanvas, usePreprocess, Tool } from "@/lib"
+import { Fullscreen, PaintBucket, Paintbrush, Pencil, StopCircle, ZoomIn, ZoomOut } from "lucide-react"
 
-import { Fullscreen, PaintBucket, Paintbrush, Palette, Pencil, StopCircle, ZoomIn, ZoomOut } from "lucide-react"
+import { useStore, HexColor } from "@/lib"
 
-import { Slider, CanvasBox, CanvasRoot } from "./ui"
+import { Slider, CanvasBox, CanvasRoot, ColorPicker } from "./ui"
 import { AppAppBar } from "./AppAppbar"
-import Image from "next/image"
-import Logo from "../../public/logo.png"
-import { ToggleButton, ToggleButtonGroup } from "@mui/material"
 
 const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
   const {
-    state,
-    uploadFile,
+    store,
     setCanvas,
     setMode,
     resetImageData,
+  } = useStore()
+
+  const {
     openDrawMode
   } = useEditor()
 
@@ -79,25 +83,38 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
     realWidth
   } = usePreprocess()
 
+  // const [colorpickerAnchorEl, setColorpickerAnchorEl] = React.useState<HTMLButtonElement | null>(null);
+
+  // const handleClickColorpicker = (event: React.MouseEvent<HTMLButtonElement>) => {
+  //   setColorpickerAnchorEl(event.currentTarget);
+  // };
+
+  // const handleCloseColorpicker = () => {
+  //   setColorpickerAnchorEl(null);
+  // };
+  // const openColorPicker = Boolean(colorpickerAnchorEl);
+  // const colorpickerPopoverId = openColorPicker ? 'colorpicker-popover' : undefined;
+
+
   const imgRef = React.useRef<HTMLImageElement>(null)
 
   function handleTargetWidthChange(e: any, newValue: number | number[]) {
-    if (state.imageData && ref.current) {
+    if (store.imageData && ref.current) {
       setTargetWidth(typeof newValue == "number" ? newValue : 0)
     }
   }
 
   function handleTargetColorsChange(e: any, newValue: number | number[]) {
-    if (state.imageData && ref.current) {
+    if (store.imageData && ref.current) {
       setTargetColor(typeof newValue == "number" ? newValue : 0)
     }
   }
 
   function plotImage(): void {
-    if (state.imageData && ref.current) {
+    if (store.imageData && ref.current) {
       const editableCanvas = new EditableCanvas(
         ref.current,
-        state.imageData,
+        store.imageData,
       )
       setCanvas(editableCanvas)
     }
@@ -105,7 +122,7 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
 
   React.useEffect(() => {
     plotImage()
-  }, [state.imageData])
+  }, [store.imageData])
 
   function reset() {
     resetImageData()
@@ -114,29 +131,26 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
 
   const iconTextColor = React.useCallback(() => {
     return getContrastRatio(
-      state.canvasEditorState?.activeColor || "#fff", "#000") > 4
-      ? darken(state.canvasEditorState?.activeColor || "#fff", .6)
-      : lighten(state.canvasEditorState?.activeColor || "#fff", .6)
-  }, [state.canvasEditorState?.activeColor || "#fff"])
+      store.canvasEditorState?.activeColor || "#fff", "#000") > 4
+      ? darken(store.canvasEditorState?.activeColor || "#fff", .6)
+      : lighten(store.canvasEditorState?.activeColor || "#fff", .6)
+  }, [store.canvasEditorState?.activeColor || "#fff"])
 
   const iconStyle = {
     width: "1rem",
     height: "1rem",
   }
 
-  function getMainImage() {
-    return imgRef.current
-  }
-
-  return <TabContext value={state.mode || Mode.PREPROCESS}>
+  const [bufferColor, setBufferColor] = React.useState<HexColor | null>(null)
+  return <TabContext value={store.mode || Mode.PREPROCESS}>
     <AppAppBar />
     <Drawer
-      open={state.mode === Mode.PREPROCESS}
+      open={store.mode === Mode.PREPROCESS}
       onClose={() => setMode(Mode.DRAW)}
       variant="persistent"
     >
       {
-        state.imageData && <Box sx={{
+        store.imageData && <Box sx={{
           display: "flex",
           flexDirection: "column",
           justifyContent: "space-around",
@@ -184,7 +198,7 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
     </Drawer>
 
     <Drawer
-      open={state.mode === Mode.DRAW}
+      open={store.mode === Mode.DRAW}
       variant="persistent"
     >
       <Box sx={{
@@ -199,7 +213,7 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
       }}>
         <ToggleButtonGroup
           orientation="vertical"
-          value={state.canvasEditorState.activeTool}
+          value={store.canvasEditorState.activeTool}
           exclusive
           onChange={(e, value) => setTool(value)}
         >
@@ -219,40 +233,14 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
             <PaintBucket />
           </ToggleButton >
         </ToggleButtonGroup>
-        <Button
-          disableFocusRipple
-          disableTouchRipple
-          disableElevation
-          variant="contained"
-          sx={{
-            position: "relative",
-            overflow: "clip",
-            backgroundColor: state.canvasEditorState?.activeColor || "#fff",
-            "&:hover": {
-              backgroundColor: alpha(state.canvasEditorState?.activeColor || "#fff", .6),
-            }
-          }}>
-          <InputBase
-            onChange={(e) => {
-              setColor(e.target.value)
+
+        <ColorPicker
+          presetColors={store.canvas ? [...store.canvas.counter.keys()].slice(0, 100) : undefined}
+          setColor={(e) => {
+            setColor(e as HexColor)
             }}
-            value={state.canvasEditorState?.activeColor || "#fff"}
-            type="color"
-            sx={{
-              cursor: "pointer",
-              position: "absolute",
-              width: "100%",
-              opacity: 0,
-              zIndex: 100,
-              "& .MuiInputBase-input": {
-                backgroundColor: "red",
-                minHeight: "3.5rem",
-                cursor: "cell"
-              }
-            }}
-          />
-          <Palette style={{ ...iconStyle, color: iconTextColor() }} />
-        </Button>
+          color={store.canvasEditorState?.activeColor || "#fff"}
+        />
 
         <Stack
           gap={.25}
@@ -267,8 +255,8 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
             padding: ".5rem 0",
           }}
         >
-          {state.canvas &&
-            [...state.canvas.counter.keys()].slice(0, 100).map((c, index) => (
+          {store.canvas &&
+            [...store.canvas.counter.keys()].slice(0, 100).map((c, index) => (
               <Button
                 variant="contained"
                 key={`color-${index}=${c}`}
@@ -315,7 +303,7 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
 
     <CanvasBox sx={{ marginLeft: "4.4rem" }}>
       {
-        state.mode === Mode.NEW
+        store.mode === Mode.NEW
         && <Button onClick={openDrawMode} sx={{ margin: "auto" }}>
           <Box
             sx={{
@@ -338,8 +326,8 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
 
       }
       {
-        state.imageData
-        && state.mode !== Mode.NEW
+        store.imageData
+        && store.mode !== Mode.NEW
         && <CanvasRoot
           ref={ref}
           onMouseDown={mouseDown}
@@ -351,10 +339,10 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
           }}
           sx={{
             cursor:
-              state.mode == Mode.DRAW
+              store.mode == Mode.DRAW
                 ? "crosshair"
                 : "default",
-            width: state.canvas?.width
+            width: store.canvas?.width
           }}
         />
       }

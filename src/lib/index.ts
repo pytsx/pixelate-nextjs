@@ -34,5 +34,12 @@ export * from "./editor"
 export type * from "./editor"
 
 export * from "./canvas"
+export type * from "./canvas"
 
 export * from "./preprocess"
+
+export * from "./store"
+export type * from "./store"
+
+export * from "./utils"
+export type * from "./utils"

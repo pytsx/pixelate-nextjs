@@ -21,25 +21,21 @@
  * Copyright 2022 Google LLC
  */
 
-import { EditorState } from "../editor"
+import React from "react"
 import { HexColor } from "../utils"
+import { Tool } from "../editor"
 
-export interface IInstructions {
-  totalWidth(): number
-  totalHeight(): number
-  totalCount(): number
-  lowerTime(): number
-  upperTime(): number
-  getIndex(color: HexColor): string
-  width(): number
-  height(): number
-  isHalf(index: number, total: number): boolean
-  toggleCrossedColor(color: HexColor): void
-  toggleCrossedRow(row: number): void
-  toggleCrossedColumn(column: number): void
+interface ICanvas {
+  mouseMove(e: React.MouseEvent<HTMLCanvasElement>): void,
+  mouseDown(e: React.MouseEvent<HTMLCanvasElement>): void,
+  ref: React.RefObject<HTMLCanvasElement>,
+  setColor(value: HexColor): void,
+  uploadImage(event: React.ChangeEvent<HTMLInputElement>): void,
+  zoomIn(): void,
+  zoomOut(): void,
+  zoomToFit(): void,
+  mouseUp(e: React.MouseEvent<HTMLCanvasElement>): void,
+  setTool(value: Tool): void
 }
 
-
-export function useInstructions(): IInstructions
-
-function toggle<T>(value: T, set: Set<T>): void
+export function useCanvas(): ICanvas
