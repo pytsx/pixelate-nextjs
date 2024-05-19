@@ -32,6 +32,7 @@ export interface StoreState {
   imageData: EditableImageData | null
   originalImageData: EditableImageData | null
   canvas: EditableCanvas | null
+  recovered: boolean
 }
 
 export const initialStoreState: StoreState
@@ -71,6 +72,11 @@ export type StoreActions =
     }
   } | {
     type: "RESET_IMAGE_DATA"
+  } | {
+    type: "RECOVERED",
+    payload: {
+      value: boolean
+    }
   }
 
 export function storeReducer(state: StoreState, action: StoreActions): StoreState 

@@ -21,22 +21,23 @@
  * Copyright 2022 Google LLC
  */
 
-export * from "./image"
-export type * from "./image"
+"use client"
 
-export * from "./io"
-export type * from "./io"
+import { serializeState, deserializeState } from "../utils/serialize"
 
-export * from "./editor"
-export type * from "./editor"
+const STORAGE_KEY = "state"
 
-export * from "./canvas"
-export type * from "./canvas"
-
-export * from "./preprocess"
-
-export * from "./store"
-export type * from "./store"
-
-export * from "./utils"
-export type * from "./utils"
+export function StorageService() {
+  return {
+    clear() {
+      window.localStorage.clear()
+    },
+    save(data) {
+      window.localStorage.setItem(STORAGE_KEY, serializeState(data))
+    },
+    async read() {
+      const data = window.localStorage.getItem(STORAGE_KEY)
+      return data ? deserializeState(data) : null
+    }
+  }
+}

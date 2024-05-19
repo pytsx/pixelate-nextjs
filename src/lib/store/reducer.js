@@ -24,15 +24,16 @@
 import { produce } from "immer"
 import { EditableImageData } from "../image"
 
-
 export function storeReducer(state, action) {
   return produce(state, (draft) => {
     switch (action.type) {
       case "LOAD_DATA":
-        draft = {
-          ...draft,
-          ...action.payload.value
-        }
+        draft.mode = action.payload.value.mode
+        draft.canvasEditorState = action.payload.value.canvasEditorState
+        draft.imageData = draft.imageData
+        draft.originalImageData = draft.originalImageData
+        draft.canvas = action.payload.value.canvas
+
         break
       case "SET_MODE":
         draft.mode = action.payload.value
@@ -60,6 +61,9 @@ export function storeReducer(state, action) {
       case "RESET_IMAGE_DATA":
         draft.imageData = draft.originalImageData
         break
+      case "RECOVERED":
+        draft.recovered = action.payload.value
+        break
       case "SET_CANVAS_IMAGE_DATA":
         if (!draft.canvas) break
         draft.canvas.setImageData(action.payload.value)
@@ -83,4 +87,5 @@ export const initialStoreState = {
   },
   imageData: null,
   canvas: null,
+  recovered: false
 }

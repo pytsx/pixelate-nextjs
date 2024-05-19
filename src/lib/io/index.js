@@ -54,7 +54,7 @@ export async function loadImageFile(imageFile) {
 
 export async function waitForImage(img) {
   return new Promise((resolve, reject) => {
-    img.onerror = () => {
+    img.onerror = (e) => {
       reject(e)
     }
     if (img.complete) {

@@ -24,6 +24,7 @@
 import { downloadFile, loadImageFile, showFileDialog } from "../io"
 import { getImageData, hasImageData } from "../image"
 import { useStore } from "../store"
+import { useCanvas } from "../canvas"
 
 export const Mode = {
   NEW: "n",
@@ -47,11 +48,13 @@ export const useEditor = () => {
     reset,
   } = useStore()
 
+
   async function openImageFile(file) {
     setMode("p")
     const img = await loadImageFile(file)
     const imageData = getImageData(img)
     setImageData(imageData)
+
   }
 
   function newFile() { reset() }

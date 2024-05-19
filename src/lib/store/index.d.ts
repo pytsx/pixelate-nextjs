@@ -21,7 +21,7 @@
  * Copyright 2022 Google LLC
  */
 
-import { StoreState } from "./reducer";
+import { StoreState, StoreActions } from "./reducer";
 
 interface StoreContext {
   store: StoreState
@@ -33,6 +33,8 @@ interface StoreContext {
   setMode(mode: StoreState["mode"]): void,
   setCanvasImageData(imageData: ImageData): void,
   resetImageData(): void
+  recovered: boolean
+  setRecovered(value: boolean): void
 }
 
 export function StoreProvider(props: React.PropsWithChildren): JSX.Element

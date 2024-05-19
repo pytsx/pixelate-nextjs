@@ -28,11 +28,14 @@ import React from "react"
 import { Mode, Tool } from ".."
 import { getContext2D } from "@/lib/utils"
 import { useStore } from "../store"
+import { StorageService } from "../store/service"
 
 export function useCanvas() {
-  const { store, setCanvasState, setImageData } = useStore()
+  const { store, setCanvasState, setImageData, recovered, setRecovered } = useStore()
   const [operations, setOperations] = React.useState([])
   const [currentOperation, setCurrentOperation] = React.useState(0)
+  const [history, setHistory] = React.useState([])
+  const [historyIndex, setHistoryIndex] = React.useState(0)
   const ref = React.useRef(null)
 
   const setEnableFill = (value) => {
@@ -73,8 +76,8 @@ export function useCanvas() {
 
   function zoomIn() {
     setZoom(Math.min(store.canvasEditorState.maxScale, store.canvasEditorState.zoom + 1))
-
   }
+
   function zoomOut() {
     setZoom(Math.max(1, store.canvasEditorState.zoom - 1))
   }
@@ -120,6 +123,7 @@ export function useCanvas() {
       y,
       x,
     }
+
     if (
       prevOperation
       && prevOperation.x === newOperation.x
@@ -135,6 +139,7 @@ export function useCanvas() {
         && op.color === newOperation.color
         && op.tool === newOperation.tool
     )) return
+
     if (
       prevColor === store.canvasEditorState.activeColor
       && store.canvasEditorState.activeTool === Tool.DRAW
@@ -163,27 +168,49 @@ export function useCanvas() {
     setCurrentOperation(0)
   }
 
+
   function draw(x, y, color = store.canvasEditorState.activeColor) {
     if (!ref.current || !store.canvas) return
     const ctx = getContext2D(ref.current)
     if (!ctx) return
-
-    store.canvas.redraw(store.canvas.imageData.draw(x, y, color))
+    const prevColor = store.canvas.pick(x, y)
+    const dirtyArea = store.canvas.imageData.draw(x, y, color)
+    store.canvas.redraw(dirtyArea)
+    setHistory(prev => {
+      if (prev.some(op => op.type === Tool.DRAW && op.payload.x === x && op.payload.y === y)) return prev
+      return [...prev, {
+        type: Tool.DRAW,
+        payload: { x, y, color: prevColor }
+      }]
+    })
+    setHistoryIndex(history.length)
   }
 
-  function fillAll(x, y) {
+  function fillAll(x, y, color) {
     if (!store.canvas) return
-    const dirtyArea = store.canvas.imageData.fillAll(x, y, store.canvasEditorState.activeColor)
+    const prevColor = store.canvas.pick(x, y)
+    const dirtyArea = store.canvas.imageData.fillAll(x, y, color)
     if (dirtyArea) {
       store.canvas.redraw(dirtyArea)
+      setHistory(prev => [...prev, {
+        type: Tool.FILL_ALL,
+        payload: { x, y, color: prevColor }
+      }])
+      setHistoryIndex(history.length)
     }
   }
 
-  function fill(x, y) {
+  function fill(x, y, color) {
     if (!store.canvas) return
-    const dirtyArea = store.canvas.imageData.fill(x, y, store.canvasEditorState.activeColor)
+    const prevColor = store.canvas.pick(x, y)
+    const dirtyArea = store.canvas.imageData.fill(x, y, color)
     if (dirtyArea) {
       store.canvas.redraw(dirtyArea)
+      setHistory(prev => [...prev, {
+        type: Tool.FILL,
+        payload: { x, y, color: prevColor }
+      }])
+      setHistoryIndex(history.length)
     }
   }
 
@@ -223,18 +250,16 @@ export function useCanvas() {
   function processOperations() {
     if (operations.length > 0 && store.canvas) {
       for (let i = currentOperation; i < operations.length; i++) {
-
         const operation = operations[i]
-
         switch (operation.tool) {
           case Tool.DRAW:
             draw(operation.x, operation.y, operation.color);
             break;
           case Tool.FILL:
-            fill(operation.x, operation.y);
+            fill(operation.x, operation.y, operation.color);
             break;
           case Tool.FILL_ALL:
-            fillAll(operation.x, operation.y);
+            fillAll(operation.x, operation.y, operation.color);
             break;
           default:
             break;
@@ -244,9 +269,52 @@ export function useCanvas() {
     }
   }
 
+  function undo() {
+    // TODO: Implement a better way to undo operations
+    // This is a temporary solution
+    const lastOperation = history[historyIndex]
+    if (!lastOperation) return
+
+    const {
+      type,
+      payload
+    } = lastOperation
+
+    const {
+      x,
+      y,
+      color
+    } = payload
+
+    if (
+      !type ||
+      !payload ||
+      !x ||
+      !y ||
+      !color
+    ) return
+
+    switch (type) {
+      case Tool.DRAW || "draw":
+        draw(x, y, color);
+        break;
+      case Tool.FILL || "fill":
+        fill(x, y, color);
+        break;
+      case Tool.FILL_ALL || "fillAll":
+        fillAll(x, y, color);
+        break;
+      default:
+        break;
+    }
+    setHistoryIndex(historyIndex - 1)
+  }
+
   React.useEffect(() => {
-    if (store.mode === Mode.PREPROCESS) {
+    if (store.mode === Mode.PREPROCESS) { zoomToFit() }
+    if (recovered) {
       zoomToFit()
+      setRecovered(false)
     }
   }, [store.canvas])
 
@@ -268,6 +336,7 @@ export function useCanvas() {
     zoomOut,
     zoomToFit,
     mouseUp,
-    setTool
+    setTool,
+    undo
   }
 }

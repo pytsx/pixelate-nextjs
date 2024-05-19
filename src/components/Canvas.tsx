@@ -30,85 +30,34 @@ import Logo from "../../public/logo.png"
 
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Drawer from "@mui/material/Drawer"
-import IconButton from "@mui/material/IconButton"
-import Stack from "@mui/material/Stack"
 import TabContext from "@mui/lab/TabContext"
-import Typography from "@mui/material/Typography"
-import ToggleButton from "@mui/material/ToggleButton"
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup"
 
-import { getContrastRatio, alpha, darken, lighten } from "@mui/material/styles"
-import { EditableCanvas, Mode, useEditor, useCanvas, usePreprocess, Tool } from "@/lib"
-import { Fullscreen, PaintBucket, Paintbrush, Pencil, StopCircle, ZoomIn, ZoomOut } from "lucide-react"
+import { EditableCanvas, Mode, useEditor, useCanvas } from "@/lib"
 
-import { useStore, HexColor } from "@/lib"
+import { useStore } from "@/lib"
 
-import { Slider, CanvasBox, CanvasRoot, ColorPicker } from "./ui"
+import { CanvasBox, CanvasRoot } from "./ui"
 import { AppAppBar } from "./AppAppbar"
+import { DrawDrawer, PreprocessDrawer } from "./drawers"
 
 const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
   const {
     store,
     setCanvas,
-    setMode,
-    resetImageData,
   } = useStore()
 
   const {
-    openDrawMode
+    openDrawMode,
   } = useEditor()
 
   const {
     mouseDown,
     mouseMove,
-    ref,
-    setColor,
-    zoomIn,
-    zoomOut,
-    zoomToFit,
     mouseUp,
-    setTool
+    ref,
   } = useCanvas()
 
-  const {
-    setTargetWidth,
-    targetWidth,
-    maxTargetWidth,
-    setTargetColor,
-    maxTargetColors,
-    targetColors,
-    targetHeight,
-    realHeight,
-    realWidth
-  } = usePreprocess()
-
-  // const [colorpickerAnchorEl, setColorpickerAnchorEl] = React.useState<HTMLButtonElement | null>(null);
-
-  // const handleClickColorpicker = (event: React.MouseEvent<HTMLButtonElement>) => {
-  //   setColorpickerAnchorEl(event.currentTarget);
-  // };
-
-  // const handleCloseColorpicker = () => {
-  //   setColorpickerAnchorEl(null);
-  // };
-  // const openColorPicker = Boolean(colorpickerAnchorEl);
-  // const colorpickerPopoverId = openColorPicker ? 'colorpicker-popover' : undefined;
-
-
   const imgRef = React.useRef<HTMLImageElement>(null)
-
-  function handleTargetWidthChange(e: any, newValue: number | number[]) {
-    if (store.imageData && ref.current) {
-      setTargetWidth(typeof newValue == "number" ? newValue : 0)
-    }
-  }
-
-  function handleTargetColorsChange(e: any, newValue: number | number[]) {
-    if (store.imageData && ref.current) {
-      setTargetColor(typeof newValue == "number" ? newValue : 0)
-    }
-  }
 
   function plotImage(): void {
     if (store.imageData && ref.current) {
@@ -124,183 +73,13 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
     plotImage()
   }, [store.imageData])
 
-  function reset() {
-    resetImageData()
-    zoomToFit()
-  }
 
-  const iconTextColor = React.useCallback(() => {
-    return getContrastRatio(
-      store.canvasEditorState?.activeColor || "#fff", "#000") > 4
-      ? darken(store.canvasEditorState?.activeColor || "#fff", .6)
-      : lighten(store.canvasEditorState?.activeColor || "#fff", .6)
-  }, [store.canvasEditorState?.activeColor || "#fff"])
 
-  const iconStyle = {
-    width: "1rem",
-    height: "1rem",
-  }
-
-  const [bufferColor, setBufferColor] = React.useState<HexColor | null>(null)
   return <TabContext value={store.mode || Mode.PREPROCESS}>
     <AppAppBar />
-    <Drawer
-      open={store.mode === Mode.PREPROCESS}
-      onClose={() => setMode(Mode.DRAW)}
-      variant="persistent"
-    >
-      {
-        store.imageData && <Box sx={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "space-around",
-          height: "100%",
-          alignItems: "center",
-          gap: 4,
-          padding: "2rem 1rem",
-          width: "fit-content",
-        }}>
-          <Slider
-            orientation="vertical"
-            onChangeCommitted={(e, value) => {
-              handleTargetWidthChange(e, value)
-            }}
-            onChange={handleTargetWidthChange}
-            value={targetWidth}
-            min={8}
-            max={maxTargetWidth()}
-            step={1}
-            valueLabelDisplay="auto"
-          />
-          <Slider
-            orientation="vertical"
-            onChangeCommitted={(e, value) => {
-              handleTargetColorsChange(e, value)
-            }}
-            onChange={handleTargetColorsChange}
-            value={targetColors}
-            min={2}
-            max={maxTargetColors()}
-            step={1}
-            valueLabelDisplay="auto"
-          />
 
-          <Stack alignItems={"center"} sx={{ minWidth: "6rem" }}>
-            <Typography>
-              {targetWidth} x {targetHeight()} <br />
-            </Typography>
-            <Typography variant="caption">
-              {realWidth()}cm x {realHeight()}cm
-            </Typography>
-          </Stack>
-        </Box >
-      }
-    </Drawer>
-
-    <Drawer
-      open={store.mode === Mode.DRAW}
-      variant="persistent"
-    >
-      <Box sx={{
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "space-around",
-        height: "100%",
-        alignItems: "center",
-        gap: .25,
-        padding: ".5rem 0",
-        width: "5rem"
-      }}>
-        <ToggleButtonGroup
-          orientation="vertical"
-          value={store.canvasEditorState.activeTool}
-          exclusive
-          onChange={(e, value) => setTool(value)}
-        >
-          <ToggleButton
-            value={Tool.DRAW}
-          >
-            <Pencil />
-          </ToggleButton >
-          <ToggleButton
-            value={Tool.FILL}
-          >
-            <Paintbrush />
-          </ToggleButton >
-          <ToggleButton
-            value={Tool.FILL_ALL}
-          >
-            <PaintBucket />
-          </ToggleButton >
-        </ToggleButtonGroup>
-
-        <ColorPicker
-          presetColors={store.canvas ? [...store.canvas.counter.keys()].slice(0, 100) : undefined}
-          setColor={(e) => {
-            setColor(e as HexColor)
-            }}
-          color={store.canvasEditorState?.activeColor || "#fff"}
-        />
-
-        <Stack
-          gap={.25}
-          direction={"column"}
-          alignItems={"center"}
-          width={"100%"}
-          height={"100%"}
-          sx={{
-            overflowY: "auto",
-            scrollbarWidth: "thin",
-            scrollbarGutter: "stable",
-            padding: ".5rem 0",
-          }}
-        >
-          {store.canvas &&
-            [...store.canvas.counter.keys()].slice(0, 100).map((c, index) => (
-              <Button
-                variant="contained"
-                key={`color-${index}=${c}`}
-                onClick={() => setColor(c)}
-                sx={{
-                  backgroundColor: c,
-                  border: "2px solid",
-                  borderColor: darken(c, .3),
-                  marginLeft: 1.25,
-                  ":hover": {
-                    backgroundColor: alpha(c, .6),
-                  }
-                }}
-                disableElevation
-              >
-              </Button>
-            ))
-          }
-        </Stack>
-
-        <Stack sx={{
-          padding: "0 .5rem",
-        }}>
-          <IconButton onClick={() => zoomIn()}><ZoomIn /></IconButton>
-          <IconButton onClick={() => zoomToFit()}><Fullscreen /></IconButton>
-          <IconButton onClick={() => zoomOut()}><ZoomOut /></IconButton>
-
-        </Stack>
-        <Button
-          variant="contained"
-          color="error"
-          onClick={reset}
-          disableElevation
-          disableFocusRipple
-          disableTouchRipple
-          sx={{
-            height: "2.2rem"
-          }}
-        >
-          <StopCircle />
-        </Button>
-      </Box>
-    </Drawer>
-
+    <PreprocessDrawer />
+    <DrawDrawer />
     <CanvasBox sx={{ marginLeft: "4.4rem" }}>
       {
         store.mode === Mode.NEW

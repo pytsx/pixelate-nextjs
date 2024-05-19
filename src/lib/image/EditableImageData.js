@@ -156,6 +156,7 @@ export class EditableImageData {
     ctx.putImageData(this.imageData, 0, 0);
     return canvas.toDataURL('image/png');
   }
+
   toImg() {
     const img = new Image();
     img.src = this.toDataURL();

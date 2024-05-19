@@ -36,6 +36,7 @@ interface ICanvas {
   zoomToFit(): void,
   mouseUp(e: React.MouseEvent<HTMLCanvasElement>): void,
   setTool(value: Tool): void
+  undo(): void,
 }
 
 export function useCanvas(): ICanvas

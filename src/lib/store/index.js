@@ -26,11 +26,44 @@
 import { Mode } from "../editor"
 import React from "react"
 import { initialStoreState, storeReducer } from "./reducer"
+import { StorageService } from "./service"
 
 export const StoreContext = React.createContext({})
 
 export const StoreProvider = (props) => {
   const [store, dispatch] = React.useReducer(storeReducer, initialStoreState)
+  const [recovered, _setRecovered] = React.useState(false)
+  const setRecovered = (value) => _setRecovered(value)
+
+  React.useEffect(() => {
+    StorageService().read().then(data => {
+      if (data && data.imageData) {
+        setRecovered(true)
+        setImageData(data.imageData)
+        setMode(data.mode)
+        dispatch({
+          type: "RECOVERED",
+          payload: {
+            value: true
+          }
+        })
+        setMode(data.mode)
+      } else {
+        dispatch({
+          type: "RECOVERED",
+          payload: {
+            value: false
+          }
+        })
+      }
+    })
+  }, [])
+
+  React.useEffect(() => {
+    if (store.canvas && store.canvasEditorState && store.imageData && store.mode) {
+      StorageService().save(store)
+    }
+  }, [store.canvas, store.imageData, store.mode])
 
   function loadData(data) {
     dispatch({
@@ -53,7 +86,9 @@ export const StoreProvider = (props) => {
     }
   }
 
+
   function setImageData(imageData) {
+
     dispatch({
       type: "SET_IMAGE_DATA",
       payload: {
@@ -63,6 +98,7 @@ export const StoreProvider = (props) => {
   }
 
   function setCanvas(canvas) {
+
     dispatch({
       type: "SET_CANVAS",
       payload: {
@@ -72,6 +108,8 @@ export const StoreProvider = (props) => {
   }
 
   function setCanvasState(state) {
+
+
     dispatch({
       type: "SET_CANVAS_EDITOR_STATE",
       payload: {
@@ -93,13 +131,14 @@ export const StoreProvider = (props) => {
     dispatch({
       type: "RESET"
     })
+
+    StorageService().clear()
   }
 
   function resetImageData() {
     dispatch({
       type: "RESET_IMAGE_DATA"
     })
-
   }
 
   return <StoreContext.Provider
@@ -112,7 +151,9 @@ export const StoreProvider = (props) => {
       setCanvasState,
       setMode,
       setCanvasImageData,
-      resetImageData
+      resetImageData,
+      recovered,
+      setRecovered
     }}
     {...props}
   />
