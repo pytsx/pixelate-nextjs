@@ -51,22 +51,22 @@ export default function RootLayout({
     <html lang="en" className={inter.className}>
       <body>
         {colorSchemeScript}
-        <AppRouterCacheProvider
-          options={{
-            enableCssLayer: true,
-          }}
-        >
-          <CssVarsProvider
-            theme={theme}
-            defaultMode="system"
-            disableTransitionOnChange
+        <StoreProvider>
+          <AppRouterCacheProvider
+            options={{
+              enableCssLayer: true,
+            }}
           >
+            <CssVarsProvider
+              theme={theme}
+              defaultMode="system"
+              disableTransitionOnChange
+            >
               <CssBaseline />
-            <StoreProvider>
               {children}
-            </StoreProvider>
-          </CssVarsProvider>
-        </AppRouterCacheProvider>
+            </CssVarsProvider>
+          </AppRouterCacheProvider>
+        </StoreProvider>
       </body>
     </html>
   );

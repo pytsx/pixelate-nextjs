@@ -29,7 +29,7 @@ import Drawer from "@mui/material/Drawer"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 
-import { Mode, useCanvas, useEditor, usePreprocess, useStore } from "@/lib"
+import { Mode, usePreprocess, useStore } from "@/lib"
 import { Slider } from "../ui"
 
 function PreprocessDrawer() {
@@ -37,13 +37,6 @@ function PreprocessDrawer() {
     store,
     setMode,
   } = useStore()
-
-  const {
-  } = useEditor()
-
-  const {
-    ref,
-  } = useCanvas()
 
   const {
     setTargetWidth,
@@ -59,13 +52,13 @@ function PreprocessDrawer() {
 
 
   function handleTargetWidthChange(e: any, newValue: number | number[]) {
-    if (store.imageData && ref.current) {
+    if (store.imageData) {
       setTargetWidth(typeof newValue == "number" ? newValue : 0)
     }
   }
 
   function handleTargetColorsChange(e: any, newValue: number | number[]) {
-    if (store.imageData && ref.current) {
+    if (store.imageData) {
       setTargetColor(typeof newValue == "number" ? newValue : 0)
     }
   }
@@ -127,4 +120,5 @@ function PreprocessDrawer() {
 }
 
 PreprocessDrawer.displayName = "PreprocessDrawer"
+
 export { PreprocessDrawer }
