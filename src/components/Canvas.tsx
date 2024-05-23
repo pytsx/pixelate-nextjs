@@ -39,6 +39,7 @@ import { useStore } from "@/lib"
 import { CanvasBox, CanvasRoot } from "./ui"
 import { AppAppBar } from "./AppAppbar"
 import { DrawDrawer, PreprocessDrawer } from "./drawers"
+import {Frames} from "./Frames"
 
 const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
   const {
@@ -125,7 +126,22 @@ const Canvas = React.forwardRef<HTMLCanvasElement>((inProps, inRef) => {
           }}
         />
       }
+    {
+      store.mode !== Mode.NEW 
+      && <Frames>
+        <div>
+            <img
+            style={
+              {}
+            }
+            src={store.imageData?.toDataURL()} />
+          </div>
+      </Frames>
+    }
+ 
+
     </CanvasBox>
+  
   </TabContext>
 })
 

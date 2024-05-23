@@ -24,7 +24,6 @@
 import { downloadFile, loadImageFile, showFileDialog } from "../io"
 import { getImageData, hasImageData } from "../image"
 import { useStore } from "../store"
-import { useCanvas } from "../canvas"
 
 export const Mode = {
   NEW: "n",
@@ -38,7 +37,6 @@ export const Tool = {
   FILL: "FILL",
   FILL_ALL: "FILL_ALL"
 }
-
 
 export const useEditor = () => {
   const {

@@ -24,7 +24,6 @@
 import { EditableImageData, getImageData } from "../image";
 import { isHexColor } from "./ColorManipulation";
 import { decodeBase64, loadImageFile } from "../io"
-import { Mode } from "../editor";
 
 const QUERY_KEYS = {
   activeColor: 'c',
